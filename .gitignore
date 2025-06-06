@@ -1,0 +1,24 @@
+# Виртуальное окружение
+.venv/
+venv/
+env/
+
+# Файлы среды
+.env
+.env.local
+.env.*.local
+
+# pip
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+
+# Poetry
+.build
+dist/
+poetry.toml
+
+# Логи
+*.log
+logs/
