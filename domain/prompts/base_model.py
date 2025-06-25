@@ -1,15 +1,14 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean, Text
 from sqlalchemy.orm import relationship
 from ..database import Base
 
 class Prompt(Base):
     __tablename__ = 'prompts'
     prompt_id = Column(Integer, primary_key=True)
-    prompt_text = Column(String, nullable=False)
+    prompt_text = Column(Text)
     style_id = Column(Integer, ForeignKey('styles.style_id'))
-    user_id = Column(Integer, ForeignKey('users.user_id'))
+    source_id = Column(Integer, ForeignKey('sources.source_id'))
     created_at = Column(DateTime)
 
-    # Связи
     style = relationship("Style")
-    user = relationship("User")
+    source = relationship("Source")
