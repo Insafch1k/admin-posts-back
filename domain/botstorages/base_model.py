@@ -1,7 +1,8 @@
-from sqlalchemy import Column, Integer, DateTime
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean, Text
+from sqlalchemy.orm import relationship
 from ..database import Base
 
 class BotStorage(Base):
     __tablename__ = 'botstorages'
     bot_id = Column(Integer, primary_key=True)
-    created_at = Column(DateTime)
+    bot_key = Column(String)
