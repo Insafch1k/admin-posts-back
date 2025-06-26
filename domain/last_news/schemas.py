@@ -9,3 +9,5 @@ class LastNewsSchema(BaseModel):
     link: str
     pub_date: datetime
     decription: str
+
+#jaebrjkbearjkebnkj
