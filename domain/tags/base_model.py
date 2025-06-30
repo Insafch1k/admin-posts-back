@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean, Text
 from sqlalchemy.orm import relationship
-from ..database import Base
+from ..db_manager import Base
 
 class Tag(Base):
     __tablename__ = 'tags'

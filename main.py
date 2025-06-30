@@ -1,8 +1,4 @@
-import requests
+from application.api import app
 
-response = requests.get(
-            url="https://habr.com/en/companies/postgrespro/articles/902888/?utm_source=habrahabr&utm_medium=rss&utm_campaign=902888",
-            timeout=10
-)
-
-print(response.text)
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', debug=True)
