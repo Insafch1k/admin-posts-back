@@ -6,3 +6,5 @@ class Style(Base):
     __tablename__ = 'styles'
     style_id = Column(Integer, primary_key=True)
     parameters = Column(Text)
+
+    prompts = relationship("Prompt", back_populates="style")

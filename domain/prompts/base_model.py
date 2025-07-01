@@ -10,5 +10,5 @@ class Prompt(Base):
     channel_id = Column(Integer, ForeignKey('channels.channel_id'))
     created_at = Column(DateTime)
 
-    style = relationship("Style")
     channel = relationship("Channel", back_populates="prompts")
+    style = relationship("Style", back_populates="prompts")

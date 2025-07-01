@@ -2,6 +2,8 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from ..base import Base
+from domain.prompts.base_model import Prompt
+from domain.styles.base_model import Style
 
 
 
@@ -14,3 +16,6 @@ class Channel(Base):
     created_at = Column(DateTime)
     bot_id = Column(Integer, ForeignKey('botstorages.bot_id'))
     user_id = Column(Integer, ForeignKey('users.user_id'))
+
+    prompts = relationship("Prompt", back_populates="channel")
+    keywords = relationship("Keyword", back_populates="channel")

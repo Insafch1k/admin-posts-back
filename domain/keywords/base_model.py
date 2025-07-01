@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer, Text, ForeignKey
 from domain.base import Base
+from sqlalchemy.orm import relationship
 
 
 class Keyword(Base):
@@ -9,8 +10,4 @@ class Keyword(Base):
     channel_id = Column(Integer, ForeignKey('channels.channel_id'), nullable=False)
     word = Column(Text, nullable=False)
 
-    __table_args__ = (
-        {'schema': 'public'},
-        # Уникальное ограничение
-        UniqueConstraint('channel_id', 'word', name='unique_channel_word')
-    )
+    channel = relationship("Channel", back_populates="keywords")
