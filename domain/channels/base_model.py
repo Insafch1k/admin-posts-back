@@ -1,9 +1,8 @@
 # domain/channels/base_model.py
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
-from ..db_manager import Base
-from ..botstorages import BotStorage
-from ..users import User
+from ..base import Base
+
 
 
 class Channel(Base):
@@ -15,6 +14,3 @@ class Channel(Base):
     created_at = Column(DateTime)
     bot_id = Column(Integer, ForeignKey('botstorages.bot_id'))
     user_id = Column(Integer, ForeignKey('users.user_id'))
-
-    bot = relationship("BotStorage")
-    user = relationship("User")

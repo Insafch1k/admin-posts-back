@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean, Text
 from sqlalchemy.orm import relationship
-from ..db_manager import Base
+from ..base import Base
 
 class Source(Base):
     __tablename__ = 'sources'
