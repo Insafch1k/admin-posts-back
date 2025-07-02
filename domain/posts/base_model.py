@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean, Text
 from sqlalchemy.orm import relationship
+<<<<<<< HEAD
 
 from ..channels.base_model import Channel
 from ..database import Base
@@ -7,6 +8,9 @@ from ..images.base_model import Image
 from ..prompts.base_model import Prompt
 from ..sources.base_model import Source
 
+=======
+from ..base import Base
+>>>>>>> eb0327c6c3c9fe18309d0233e06080c03a32a2d6
 
 class Post(Base):
     __tablename__ = 'posts'
