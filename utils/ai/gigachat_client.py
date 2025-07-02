@@ -1,5 +1,7 @@
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 from langchain_gigachat.chat_models import GigaChat
+from .ai_api import system_prompt
+from ..utils.config import settings
 import gigachat.context
 from .ai_api import system_prompt
 from dotenv import load_dotenv, find_dotenv
@@ -15,8 +17,7 @@ from datetime import datetime
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Загрузка переменных окружения
-load_dotenv(find_dotenv())
+# Переменные окружения уже загружены в settings
 
 class GigaChatManager:
     def __init__(self, temperature: float = 0.7, max_tokens: int = 2000):
@@ -28,12 +29,13 @@ class GigaChatManager:
         """
         self.temperature = temperature
         self.max_tokens = max_tokens
-        
+
         try:
-            auth_token = os.getenv('AUTH')
+            # Берем токен из централизованных настроек
+            auth_token = settings.AUTH
             if not auth_token:
-                raise ValueError("AUTH token not found in environment variables")
-            
+                raise ValueError("AUTH token not found in settings")
+
             self.giga = GigaChat(
                 credentials=auth_token,
                 verify_ssl_certs=False,
@@ -101,12 +103,13 @@ class GigaChatManager:
 Дата публикации: {pubdate}
 Текст: {content}
 
-Верни ответ в формате JSON с полями:
+Верни ответ ТОЛЬКО в формате JSON с полями:
 - title: переработанный заголовок
-- description: переработанный текст"""
-            
+- description: переработанный текст
+Не включай поле pubdate в ответ."""
+
             response = self.send_message(prompt, is_first_msg=True)
-            
+
             # Парсим JSON из ответа
             try:
                 result = json.loads(response.content)

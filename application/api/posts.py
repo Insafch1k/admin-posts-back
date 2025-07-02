@@ -7,7 +7,6 @@ from utils.ai.gigachat_client import GigaChatManager
 
 posts_bp = Blueprint('posts', __name__, url_prefix='/posts')
 
-
 @posts_bp.route('/', methods=['POST'])
 def get_user_channels():
     try:
