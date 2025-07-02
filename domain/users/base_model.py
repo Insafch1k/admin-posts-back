@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean, Text
-from sqlalchemy.orm import relationship
-from ..base import Base
+from sqlalchemy.orm import relationship, Mapped
+from ..database import Base
 
 class User(Base):
     __tablename__ = 'users'
@@ -9,3 +9,5 @@ class User(Base):
     name = Column(Text)
     login = Column(Text)
     password = Column(Text)
+
+    user_channels: Mapped[list["Channel"]] = relationship(back_populates='channel_user')
