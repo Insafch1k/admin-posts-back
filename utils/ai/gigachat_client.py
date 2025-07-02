@@ -2,13 +2,15 @@ from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 from langchain_gigachat.chat_models import GigaChat
 from .ai_api import system_prompt
 from ..utils.config import settings
+import gigachat.context
+from .ai_api import system_prompt
 from dotenv import load_dotenv, find_dotenv
 import os
 from typing import Optional, Dict
 import logging
 import json
 import requests
-from readability import Document
+# from readability import Document
 from datetime import datetime
 
 # Настройка логирования
@@ -61,7 +63,7 @@ class GigaChatManager:
             logger.error(f"Error extracting content from URL: {str(e)}")
             raise
 
-    def send_message(self, user_message: str, is_first_msg: bool = False) -> AIMessage:
+    def send_message(self, source_text: str, style: str, is_first_msg: bool = True):
         """
         Отправка сообщения
 
@@ -73,10 +75,10 @@ class GigaChatManager:
             messages = []
             if is_first_msg:
                 messages.append(SystemMessage(content=system_prompt))
-
-            messages.append(HumanMessage(content=user_message))
+            messages.append(HumanMessage(content=f"Исходный пост для анализа стиля: {style}"))
+            messages.append(HumanMessage(content=f"Новость для адаптации: {source_text}"))
             response = self.giga.invoke(messages)
-            return response
+            return response.content
         except Exception as e:
             logger.error(f"Error sending message: {str(e)}")
             raise
@@ -93,10 +95,10 @@ class GigaChatManager:
         try:
             # Извлекаем контент из URL
             content = self._extract_content(link)
-
+            
             # Формируем промпт для рерайта
             prompt = f"""Перепиши следующий текст в ярком новостном стиле.
-
+            
 Заголовок: {title}
 Дата публикации: {pubdate}
 Текст: {content}
@@ -121,19 +123,18 @@ class GigaChatManager:
                     "title": title,
                     "description": response.content
                 }
-
+                
         except Exception as e:
             logger.error(f"Error rewriting post: {str(e)}")
             raise
-
 
 if __name__ == "__main__":
     try:
         giga_manager = GigaChatManager(temperature=0.7, max_tokens=2000)
         test_data = {
             "title": "",
-            "link": "https://eadaily.com/ru/news/2025/06/29/glava-fonda-druzhby-turciya-azerbaydzhan-prizvala-k-protestam-v-rossii",
-            "pubdate": ""
+            "link": "https://thebell.io/chto-izvestno-i-chego-my-ne-znaem-o-terakte-v-krokuse",
+            "pubdate": "2024-03-20T10:00:00"
         }
         result = giga_manager.rewrite_post(
             title=test_data["title"],

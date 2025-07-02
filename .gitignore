@@ -2,7 +2,7 @@
 .venv/
 venv/
 env/
-
+.idea
 # Файлы среды
 .env
 .env.local
