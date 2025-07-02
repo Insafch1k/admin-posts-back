@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean, T
 from sqlalchemy.orm import relationship, Mapped
 
 from ..channels.base_model import Channel
-from ..database import Base
+from domain.base import Base
 
 class Schedule(Base):
     __tablename__ = 'schedules'

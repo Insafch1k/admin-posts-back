@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean, T
 from sqlalchemy.orm import relationship, Mapped
 
 from ..botstorages.base_model import BotStorage
-from ..database import Base
+from domain.base import Base
 from ..users.base_model import User
 
 

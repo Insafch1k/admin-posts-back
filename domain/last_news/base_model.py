@@ -2,7 +2,7 @@ from typing import Optional
 
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean, Text
 from sqlalchemy.orm import relationship, Mapped
-from domain.database import Base
+from domain.base import Base
 from domain.sources.base_model import Source
 
 

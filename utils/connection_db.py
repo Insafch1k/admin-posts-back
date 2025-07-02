@@ -5,10 +5,10 @@ from sqlalchemy import create_engine, String
 
 def connection_db():
     dbname = settings.DB_NAME
-    user = settings.USER
-    password = settings.PASSWORD
-    host = settings.HOST_NAME
-    port = settings.PORT_NAME
+    user = settings.DB_USER
+    password = settings.DB_PASSWORD
+    host = settings.DB_HOST
+    port = settings.DB_PORT
     try:
         # for creating connection string
         connection_str = f'postgresql://{user}:{password}@{host}:{port}/{dbname}'
