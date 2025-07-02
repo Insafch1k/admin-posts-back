@@ -23,6 +23,3 @@ class ChannelDAL:
             return DataFailedMessage(error_message='Ошибка в работе базы данных!')
         finally:
             session.close()
-
-cp = ChannelDAL()
-cp.get_user_channels("1")

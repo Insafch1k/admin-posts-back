@@ -1,47 +1,58 @@
+import re
+import pymorphy3
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
-RUSSIAN_STOP_WORDS = {
-    'и', 'в', 'во', 'не', 'что', 'он', 'на', 'я', 'с', 'со', 'как', 'а',
-    'то', 'все', 'она', 'так', 'его', 'но', 'да', 'ты', 'к', 'у', 'же',
-    'вы', 'за', 'бы', 'по', 'только', 'ее', 'мне', 'было', 'вот', 'от',
-    'меня', 'еще', 'нет', 'о', 'из', 'ему', 'теперь', 'когда', 'даже',
-    'ну', 'вдруг', 'ли', 'если', 'уже', 'или', 'ни', 'быть', 'был', 'него',
-    'до', 'вас', 'нибудь', 'опять', 'уж', 'вам', 'ведь', 'там', 'потом',
-    'себя', 'ничего', 'ей', 'может', 'они', 'тут', 'где', 'есть', 'надо',
-    'ней', 'для', 'мы', 'тебя', 'их', 'чем', 'была', 'сам', 'чтоб',
-    'без', 'будто', 'чего', 'раз', 'тоже', 'себе', 'под', 'будет', 'ж',
-    'тогда', 'кто', 'этот', 'того', 'потому', 'этого', 'какой', 'совсем',
-    'ним', 'здесь', 'этом', 'один', 'почти', 'мой', 'тем', 'чтобы', 'нее',
-    'сейчас', 'были', 'куда', 'зачем', 'всех', 'никогда', 'можно', 'при',
-    'наконец', 'два', 'об', 'другой', 'хоть', 'после', 'над', 'больше',
-    'тот', 'через', 'эти', 'нас', 'про', 'всего', 'них', 'какая', 'много',
-    'разве', 'три', 'эту', 'моя', 'впрочем', 'хорошо', 'свою', 'этой',
-    'перед', 'иногда', 'лучше', 'чуть', 'том', 'нельзя', 'такой', 'им',
-    'более', 'всегда', 'конечно', 'всю', 'между'
-}
+# Инициализация pymorphy3 и NLTK
+morph = pymorphy3.MorphAnalyzer()
+stop_words = set(stopwords.words("russian"))
 
 
-def check_duplicate(new_text: str, existing_posts: list[str], threshold: float = 0.85) -> bool:
+def preprocess_text(text):
+    """Предобработка текста: приведение к нижнему регистру, токенизация, лемматизация, удаление стоп-слов."""
+    text = text.lower()
+    tokens = word_tokenize(text)
+    tokens = [morph.parse(word)[0].normal_form for word in tokens if word.isalnum() and word not in stop_words]
+    return " ".join(tokens)
+
+
+def compare_news_with_posts(news_text, posts, threshold=0.1):
     """
-    Проверяет дубликаты через косинусную схожесть TF-IDF векторов
+    Сравнивает текст новости с постами. Возвращает True, если новость можно использовать
+    (нет совпадений выше порога), и False, если есть совпадение выше порога.
 
-    Параметры:
-        new_text (str): Новый текст для проверки
-        existing_posts (list[str]): Список уже существующих постов
-        threshold (float): Порог схожести (0.85 = 85%)
+    Args:
+        news_text (str): Текст новости.
+        posts (list): Список текстов постов.
+        threshold (float): Порог схожести (по умолчанию 0.4, т.е. 40%).
 
-    Возвращает:
-        bool: True если найден дубликат
+    Returns:
+        bool: True, если новость уникальна, False, если есть совпадение выше порога.
+        list: Список кортежей (пост, сходство) для постов с наибольшим сходством.
     """
-    if not existing_posts:
-        return False
+    # Предобработка
+    processed_news = preprocess_text(news_text)
+    processed_posts = [preprocess_text(post) for post in posts]
 
-    all_texts = existing_posts.copy()
-    all_texts.append(new_text)
-
-    vectorizer = TfidfVectorizer(stop_words=RUSSIAN_STOP_WORDS)  # Используем наш набор
+    # Векторизация
+    all_texts = [processed_news] + processed_posts
+    vectorizer = TfidfVectorizer()
     tfidf_matrix = vectorizer.fit_transform(all_texts)
 
-    similarity = cosine_similarity(tfidf_matrix[-1], tfidf_matrix[:-1])
-    return any(sim > threshold for sim in similarity[0])
+    # Сравнение
+    news_vector = tfidf_matrix[0]
+    post_vectors = tfidf_matrix[1:]
+    similarities = cosine_similarity(news_vector, post_vectors)[0]
+
+    # Составляем результаты
+    results = sorted(zip(posts, similarities), key=lambda x: x[1], reverse=True)
+    print(results)
+    # Проверяем, есть ли посты с сходством выше порога
+    max_similarity = max(similarities) if similarities.size > 0 else 0
+    can_use_news = max_similarity < threshold
+
+    return can_use_news
+
+
