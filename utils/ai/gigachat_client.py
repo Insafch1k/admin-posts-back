@@ -1,14 +1,14 @@
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 from langchain_gigachat.chat_models import GigaChat
 import gigachat.context
-from ai_api import system_prompt
+from .ai_api import system_prompt
 from dotenv import load_dotenv, find_dotenv
 import os
 from typing import Optional, Dict
 import logging
 import json
 import requests
-from readability import Document
+# from readability import Document
 from datetime import datetime
 
 # Настройка логирования
@@ -61,7 +61,7 @@ class GigaChatManager:
             logger.error(f"Error extracting content from URL: {str(e)}")
             raise
 
-    def send_message(self, user_message: str, is_first_msg: bool = False) -> AIMessage:
+    def send_message(self, source_text: str, style: str, is_first_msg: bool = True):
         """
         Отправка сообщения
 
@@ -73,10 +73,10 @@ class GigaChatManager:
             messages = []
             if is_first_msg:
                 messages.append(SystemMessage(content=system_prompt))
-            
-            messages.append(HumanMessage(content=user_message))
+            messages.append(HumanMessage(content=f"Исходный пост для анализа стиля: {style}"))
+            messages.append(HumanMessage(content=f"Новость для адаптации: {source_text}"))
             response = self.giga.invoke(messages)
-            return response
+            return response.content
         except Exception as e:
             logger.error(f"Error sending message: {str(e)}")
             raise

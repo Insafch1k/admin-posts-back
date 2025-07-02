@@ -18,7 +18,6 @@
 
 import os
 import psycopg2
-import asyncpg
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -35,19 +34,17 @@ class Settings(BaseSettings):
     LOGIN: str
     SECRET_KEY: str
     JWT_SECRET_KEY: str
+    AUTH: str
 
     @property
     def DATABASE_URL_psycopg(self):
         return f'postgresql+psycopg2://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}'
 
-    @property
-    def DATABASE_URL_asyncpg(self):
-        return f'postgresql+asyncpg://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}'
 
     # model_config = SettingsConfigDict(env_file='./.env')
 
     class Config:
-        env_file = "../.env"
+        env_file = ".env"
         env_file_encoding = "utf-8"
         case_sensitive = True
 
