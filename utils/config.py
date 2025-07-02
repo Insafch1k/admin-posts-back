@@ -7,6 +7,9 @@ class Settings(BaseSettings):
     PASSWORD: str
     PORT_NAME: str
     HOST_NAME: str
+    BOT_TOKEN: str
+    CHANNEL_ID: str
+    AUTH: str
 
     class Config:
         env_file = ".env"

@@ -10,13 +10,24 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
 
+# Import all models here to ensure they are registered with SQLAlchemy's metadata
+from .posts.base_model import Post
+from .prompts.base_model import Prompt
+from .images.base_model import Image
+from .channels.base_model import Channel
+from .sources.base_model import Source
+from .styles.base_model import Style
+from .botstorages.base_model import BotStorage
+from .users.base_model import User
+from .source_type.base_model import SourceType
+
 
 from loguru import logger
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy.pool import Pool
 from typing import Optional, Callable
-from .config import settings
+from utils.config import settings
 
 
 class DatabaseManager:

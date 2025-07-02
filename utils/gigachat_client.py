@@ -1,7 +1,7 @@
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 from langchain_gigachat.chat_models import GigaChat
-import gigachat.context
-from ai_api import system_prompt
+from .ai_api import system_prompt
+from ..utils.config import settings
 from dotenv import load_dotenv, find_dotenv
 import os
 from typing import Optional, Dict
@@ -15,8 +15,7 @@ from datetime import datetime
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Загрузка переменных окружения
-load_dotenv(find_dotenv())
+# Переменные окружения уже загружены в settings
 
 class GigaChatManager:
     def __init__(self, temperature: float = 0.7, max_tokens: int = 2000):
@@ -28,12 +27,13 @@ class GigaChatManager:
         """
         self.temperature = temperature
         self.max_tokens = max_tokens
-        
+
         try:
-            auth_token = os.getenv('AUTH')
+            # Берем токен из централизованных настроек
+            auth_token = settings.AUTH
             if not auth_token:
-                raise ValueError("AUTH token not found in environment variables")
-            
+                raise ValueError("AUTH token not found in settings")
+
             self.giga = GigaChat(
                 credentials=auth_token,
                 verify_ssl_certs=False,
@@ -73,7 +73,7 @@ class GigaChatManager:
             messages = []
             if is_first_msg:
                 messages.append(SystemMessage(content=system_prompt))
-            
+
             messages.append(HumanMessage(content=user_message))
             response = self.giga.invoke(messages)
             return response
@@ -93,20 +93,21 @@ class GigaChatManager:
         try:
             # Извлекаем контент из URL
             content = self._extract_content(link)
-            
+
             # Формируем промпт для рерайта
             prompt = f"""Перепиши следующий текст в ярком новостном стиле.
-            
+
 Заголовок: {title}
 Дата публикации: {pubdate}
 Текст: {content}
 
-Верни ответ в формате JSON с полями:
+Верни ответ ТОЛЬКО в формате JSON с полями:
 - title: переработанный заголовок
-- description: переработанный текст"""
-            
+- description: переработанный текст
+Не включай поле pubdate в ответ."""
+
             response = self.send_message(prompt, is_first_msg=True)
-            
+
             # Парсим JSON из ответа
             try:
                 result = json.loads(response.content)
@@ -120,18 +121,19 @@ class GigaChatManager:
                     "title": title,
                     "description": response.content
                 }
-                
+
         except Exception as e:
             logger.error(f"Error rewriting post: {str(e)}")
             raise
+
 
 if __name__ == "__main__":
     try:
         giga_manager = GigaChatManager(temperature=0.7, max_tokens=2000)
         test_data = {
             "title": "",
-            "link": "https://thebell.io/chto-izvestno-i-chego-my-ne-znaem-o-terakte-v-krokuse",
-            "pubdate": "2024-03-20T10:00:00"
+            "link": "https://eadaily.com/ru/news/2025/06/29/glava-fonda-druzhby-turciya-azerbaydzhan-prizvala-k-protestam-v-rossii",
+            "pubdate": ""
         }
         result = giga_manager.rewrite_post(
             title=test_data["title"],
