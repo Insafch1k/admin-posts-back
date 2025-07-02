@@ -2,7 +2,7 @@ import asyncio
 import logging
 from aiogram import Bot, Dispatcher
 from utils.config import settings
-from application.tg_bot.scheduler import setup_scheduler
+from application.bot_service.scheduler import setup_scheduler
 from domain.database import db_manager
 
 async def main():

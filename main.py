@@ -1,4 +1,3 @@
-from application.tg_bot.bot import run_bot
 from application.api import app
 
 # from utils.is_fit_post import check_duplicate
