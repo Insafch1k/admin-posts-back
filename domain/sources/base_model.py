@@ -5,7 +5,7 @@ from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean, T
 from sqlalchemy.orm import relationship, Mapped
 
 from ..channels.base_model import Channel
-from ..database import Base
+from domain.base import Base
 from ..source_type.base_model import SourceType
 
 class Source(Base):

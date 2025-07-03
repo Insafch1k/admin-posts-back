@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean, Text
 from sqlalchemy.orm import relationship, Mapped
 from ..channels.base_model import Channel
-from ..database import Base
+from domain.base import Base
 
 
 class Schedule(Base):

@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean, Text
 from sqlalchemy.orm import relationship
 from ..channels.base_model import Channel
-from ..database import Base
+from domain.base import Base
 from ..images.base_model import Image
 from ..prompts.base_model import Prompt
 from ..sources.base_model import Source

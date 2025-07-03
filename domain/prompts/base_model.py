@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean, Text
 from sqlalchemy.orm import relationship
-from ..database import Base
+from domain.base import Base
 from ..sources.base_model import Source
 from ..styles.base_model import Style
 

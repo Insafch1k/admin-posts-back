@@ -2,21 +2,16 @@ from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean, T
 from sqlalchemy.orm import relationship, Mapped
 
 from ..botstorages.base_model import BotStorage
-from ..database import Base
+from domain.base import Base
 from ..users.base_model import User
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
-from sqlalchemy.orm import relationship
-from ..base import Base
-from domain.prompts.base_model import Prompt
-from domain.styles.base_model import Style
+from ..keywords.base_model import Keyword
+
 
 class Channel(Base):
     __tablename__ = 'channels'
-
     channel_id = Column(Integer, primary_key=True)
+    channel_username = Column(String, nullable=False)
     channel_title = Column(String)
-    channel_username = Column(String, nullable=False, unique=True)
-    channel_photo = Column(String)
     created_at = Column(DateTime)
     bot_id = Column(Integer, ForeignKey(BotStorage.bot_id))
     user_id = Column(Integer, ForeignKey(User.user_id))
@@ -25,5 +20,4 @@ class Channel(Base):
     channel_bot: Mapped["BotStorage"] = relationship(back_populates='bot_channels')
     channel_user: Mapped["User"] = relationship(back_populates='user_channels')
     channel_schedules: Mapped[list["Schedule"]] = relationship(back_populates='schedule_channel')
-    prompts = relationship("Prompt", back_populates="channel")
-    keywords = relationship("Keyword", back_populates="channel")
+    channel_keywords: Mapped[list["Keyword"]] = relationship(back_populates='keywords_channel')
