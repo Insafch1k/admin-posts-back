@@ -6,10 +6,9 @@ from pyrogram import Client
 from decouple import config
 from sqlalchemy import text, select, and_
 
-from domain.database import Base, db_manager
-from domain.last_news.base_model import LastNews
-from domain.sources.base_model import Source
-from domain import *
+from utils.connection_db import connection_db
+from utils.data_state import DataFailedMessage
+from domain.sources.dal import SourecDAL
 
 # Создаём папку для медиа, если не существует
 MEDIA_FOLDER = os.path.join('downloads', 'media')
@@ -23,41 +22,6 @@ phone = config('PHONE')
 login = config('LOGIN')
 
 app = Client(name=login, api_id=api_id, api_hash=api_hash, phone_number=phone)
-
-
-def get_sources_by_channel_id(channel_id: int):
-    db_manager.init_db()
-    with db_manager.session() as session:
-        if session is None:
-            print("❌ Ошибка инициализации БД")
-            return []
-
-        # Получаем type_id по названию
-        result = session.execute(
-            select(SourceType.type_id).filter(SourceType.type_name == 'Тг канал')
-        ).scalar()
-
-        if result is None:
-            print("❌ Не найден тип 'Тг канал'")
-            return []
-
-        id_of_news_type = result
-
-        # Основной запрос — правильно через select()
-        stmt = select(Source.source_id, Source.source_name).filter(
-            and_(
-                Source.channel_id == channel_id,
-                Source.type_id == id_of_news_type
-            )
-        )
-
-        sources = session.execute(stmt).all()
-
-        # print([{"id": s.source_id, "name": s.source_name} for s in sources])
-        return [{"id": s.source_id, "name": s.source_name} for s in sources]
-
-
-# get_sources_by_channel_id(1)
 
 
 def download_avatar_to_base64(app, tg_channel_name):
@@ -84,14 +48,17 @@ def download_avatar_to_base64(app, tg_channel_name):
 
 
 def get_text_media(limit=10, channel_id=1):
-    db_manager.init_db()
-    with db_manager.session() as session:
+    Session = connection_db()
+    if Session is None:
+        return DataFailedMessage(error_message='Ошибка в работе базы данных!')
+
+    with Session() as session:
         if session is None:
             print("❌ Не удалось получить сессию БД")
             return
 
         with app:  # ✅ Только один раз
-            sources = get_sources_by_channel_id(channel_id)
+            sources = SourecDAL.get_sources_by_channel_id(channel_id)
             result = []
             try:
                 for src in sources:
@@ -102,20 +69,16 @@ def get_text_media(limit=10, channel_id=1):
                     # Загрузка фото канала
                     tg_channel_avatar, tg_channel_title = download_avatar_to_base64(app, tg_channel_name)
 
-                    query_for_avatar = session.execute(
-                        select(Source).filter(Source.source_name == tg_channel_name)
-                    ).scalars().first()
+                    query_for_avatar = SourecDAL.get_source_by_source_name(tg_channel_name)
 
                     if query_for_avatar and tg_channel_avatar and (
                             query_for_avatar.source_photo is None or query_for_avatar.source_photo != tg_channel_avatar):
-                        print('1')
                         query_for_avatar.source_photo = tg_channel_avatar
                         session.add(query_for_avatar)
                         session.commit()
 
                     if query_for_avatar and tg_channel_title and (
                             query_for_avatar.source_title is None or query_for_avatar.source_title != tg_channel_title):
-                        print('2')
                         query_for_avatar.source_title = tg_channel_title
                         session.add(query_for_avatar)
                         session.commit()

@@ -4,6 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
+<<<<<<< HEAD
+    <list default="true" id="a0fe98d5-f20d-40ce-92e2-bfbf9305c00b" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/utils/downloads/media/photo_2025-06-23_10-16-58_7519461968256696332.jpg" beforeDir="false" />
+=======
     <list default="true" id="5624795d-73e8-4b53-a939-68aa8943d30a" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/domain/database.py" beforeDir="false" afterPath="$PROJECT_DIR$/domain/database.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/poetry.lock" beforeDir="false" afterPath="$PROJECT_DIR$/poetry.lock" afterDir="false" />
@@ -12,6 +16,7 @@
       <change beforePath="$PROJECT_DIR$/utils/downloads/media/photo_2025-06-23_10-16-58_7519461968256696332.jpg" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/utils/parse.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/parse.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/utils/user-app.session" beforeDir="false" afterPath="$PROJECT_DIR$/utils/user-app.session" afterDir="false" />
+>>>>>>> eb0327c6c3c9fe18309d0233e06080c03a32a2d6
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -41,6 +46,16 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
+<<<<<<< HEAD
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Асадбек/SANAK_TEAM/Tg-parse&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
+  }
+}</component>
+=======
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "RunOnceActivity.OpenProjectViewOnStart": "true",
@@ -49,6 +64,7 @@
     "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
   }
 }]]></component>
+>>>>>>> eb0327c6c3c9fe18309d0233e06080c03a32a2d6
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">

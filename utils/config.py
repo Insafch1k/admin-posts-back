@@ -1,26 +1,9 @@
-# from pydantic_settings import BaseSettings
-#
-#
-# class Settings(BaseSettings):
-#     DB_NAME: str
-#     USER: str
-#     PASSWORD: str
-#     PORT_NAME: str
-#     HOST_NAME: str
-#
-#     class Config:
-#         env_file = ".env"
-#         env_file_encoding = "utf-8"
-#         case_sensitive = True
-#
-#
-# settings = Settings()
+from dotenv import load_dotenv
+from pydantic_settings import BaseSettings
 
-import os
-import psycopg2
+dotenv_path = r"C:\Users\Асадбек\SANAK_TEAM\Zilant-Tg-Robot\admin-posts-back\.env"
 
-from pydantic_settings import BaseSettings, SettingsConfigDict
-
+load_dotenv(dotenv_path)
 
 class Settings(BaseSettings):
     DB_NAME: str
@@ -28,7 +11,7 @@ class Settings(BaseSettings):
     DB_PASSWORD: str
     DB_PORT: int
     DB_HOST: str
-    API_ID : str
+    API_ID: int
     API_HASH: str
     PHONE: str
     LOGIN: str
@@ -36,17 +19,11 @@ class Settings(BaseSettings):
     JWT_SECRET_KEY: str
     AUTH: str
 
-    @property
-    def DATABASE_URL_psycopg(self):
-        return f'postgresql+psycopg2://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}'
-
-
-    # model_config = SettingsConfigDict(env_file='./.env')
-
     class Config:
-        env_file = ".env"
+        env_file = dotenv_path  # абсолютный путь для pydantic
         env_file_encoding = "utf-8"
         case_sensitive = True
 
-
 settings = Settings()
+
+# print(settings.dict())
