@@ -7,13 +7,6 @@ from pyrogram import Client
 from decouple import config
 from sqlalchemy import text
 
-from domain.database import Base, db_manager
-from domain.last_news.base_model import LastNews
-from domain.sources.base_model import Source
-from sqlalchemy import select, func, cast, Integer, and_, insert
-from sqlalchemy.orm import aliased, joinedload, selectinload
-from domain import *
-
 # Создаём папку для медиа, если не существует
 MEDIA_FOLDER = os.path.join('downloads', 'media')
 if not os.path.exists(MEDIA_FOLDER):
@@ -27,40 +20,6 @@ login = config('LOGIN')
 
 app = Client(name=login, api_id=api_id, api_hash=api_hash, phone_number=phone)
 
-
-def get_sources_by_channel_id(channel_id: int):
-    db_manager.init_db()
-    with db_manager.session() as session:
-        if session is None:
-            print("❌ Ошибка инициализации БД")
-            return []
-
-        # Получаем type_id по названию
-        result = session.execute(
-            select(SourceType.type_id).filter(SourceType.type_name == 'Тг канал')
-        ).scalar()
-
-        if result is None:
-            print("❌ Не найден тип 'Тг канал'")
-            return []
-
-        id_of_news_type = result
-
-        # Основной запрос — правильно через select()
-        stmt = select(Source.source_id, Source.source_name).filter(
-            and_(
-                Source.channel_id == channel_id,
-                Source.type_id == id_of_news_type
-            )
-        )
-
-        sources = session.execute(stmt).all()
-
-        # print([{"id": s.source_id, "name": s.source_name} for s in sources])
-        return [{"id": s.source_id, "name": s.source_name} for s in sources]
-
-
-# get_sources_by_channel_id(1)
 
 def download_avatar_to_base64(app, tg_channel_name):
     chat = app.get_chat(tg_channel_name)
@@ -85,99 +44,99 @@ def download_avatar_to_base64(app, tg_channel_name):
 # download_avatar_to_base64()
 
 
-def get_text_media(limit=10, channel_id=1):
-    db_manager.init_db()
-    with db_manager.session() as session:
-        if session is None:
-            print("❌ Не удалось получить сессию БД")
-            return
-
-        with app:  # ✅ Только один раз
-            sources = get_sources_by_channel_id(channel_id)
-            result = []
-            try:
-                for src in sources:
-                    tg_channel_name = src['name']
-                    new_post = {tg_channel_name: []}
-                    print(f"📡 Парсинг канала: {tg_channel_name}")
-
-                    # Загрузка фото канала
-                    tg_channel_avatar, tg_channel_title = download_avatar_to_base64(app, tg_channel_name)
-
-                    query_for_avatar = session.execute(
-                        select(Source).filter(Source.source_name == tg_channel_name)
-                    ).scalars().first()
-
-                    if query_for_avatar and tg_channel_avatar and (
-                            query_for_avatar.source_photo is None or query_for_avatar.source_photo != tg_channel_avatar):
-                        print('1')
-                        query_for_avatar.source_photo = tg_channel_avatar
-                        session.add(query_for_avatar)
-                        session.commit()
-
-                    if query_for_avatar and tg_channel_title and (
-                            query_for_avatar.source_title is None or query_for_avatar.source_title != tg_channel_title):
-                        print('2')
-                        query_for_avatar.source_title = tg_channel_title
-                        session.add(query_for_avatar)
-                        session.commit()
-
-                    messages = list(app.get_chat_history(tg_channel_name, limit=limit))
-
-                    last_saved_news: LastNews = session.execute(
-                        select(LastNews).filter(LastNews.source_id == src['id']).order_by(LastNews.message_id.desc())
-                    ).scalars().first()
-
-                    last_message_id = last_saved_news.message_id if last_saved_news else 0
-                    print(f"🧾 Последний сохранённый message_id: {last_message_id}")
-
-                    newest_message = None
-
-                    for message in reversed(messages):
-                        temp_post_photo_base64_str = None
-                        if not message.text:
-                            continue
-                        if int(message.id) <= int(last_message_id):
-                            continue
-
-                        if message.photo:
-                            file_path = app.download_media(message.photo.file_id, file_name="temp_post_photo.jpg")
-                            with open(file_path, "rb") as f:
-                                temp_post_photo_base64_str = base64.b64encode(f.read()).decode("utf-8")
-                            os.remove(file_path)
-
-                        new_post[tg_channel_name].append({
-                            'message_id': message.id,
-                            'message_date': message.date,
-                            'message_text': message.text,
-                            'message_photo': temp_post_photo_base64_str[:20] if temp_post_photo_base64_str else None
-                        })
-
-                        newest_message = message
-
-                    if newest_message:
-                        new_news = LastNews(
-                            message_id=newest_message.id,
-                            source_id=src['id'],
-                            description=newest_message.text,
-                            pub_date=newest_message.date,
-                            title=newest_message.text,
-                            photo=temp_post_photo_base64_str
-                        )
-                        session.add(new_news)
-                        session.commit()
-                        print(f"\n💾 Сохранено новое сообщение с ID {newest_message.id}")
-                    else:
-                        print("📭 Нет новых сообщений")
-                    result.append(new_post)
-
-                return result
-
-            except Exception as e:
-                session.rollback()
-                print("❌ Ошибка при получении сообщений:", e)
-            finally:
-                session.close()
+# def get_text_media(limit=10, channel_id=1):
+#     db_manager.init_db()
+#     with db_manager.session() as session:
+#         if session is None:
+#             print("❌ Не удалось получить сессию БД")
+#             return
+#
+#         with app:  # ✅ Только один раз
+#             sources = get_sources_by_channel_id(channel_id)
+#             result = []
+#             try:
+#                 for src in sources:
+#                     tg_channel_name = src['name']
+#                     new_post = {tg_channel_name: []}
+#                     print(f"📡 Парсинг канала: {tg_channel_name}")
+#
+#                     # Загрузка фото канала
+#                     tg_channel_avatar, tg_channel_title = download_avatar_to_base64(app, tg_channel_name)
+#
+#                     query_for_avatar = session.execute(
+#                         select(Source).filter(Source.source_name == tg_channel_name)
+#                     ).scalars().first()
+#
+#                     if query_for_avatar and tg_channel_avatar and (
+#                             query_for_avatar.source_photo is None or query_for_avatar.source_photo != tg_channel_avatar):
+#                         print('1')
+#                         query_for_avatar.source_photo = tg_channel_avatar
+#                         session.add(query_for_avatar)
+#                         session.commit()
+#
+#                     if query_for_avatar and tg_channel_title and (
+#                             query_for_avatar.source_title is None or query_for_avatar.source_title != tg_channel_title):
+#                         print('2')
+#                         query_for_avatar.source_title = tg_channel_title
+#                         session.add(query_for_avatar)
+#                         session.commit()
+#
+#                     messages = list(app.get_chat_history(tg_channel_name, limit=limit))
+#
+#                     last_saved_news: LastNews = session.execute(
+#                         select(LastNews).filter(LastNews.source_id == src['id']).order_by(LastNews.message_id.desc())
+#                     ).scalars().first()
+#
+#                     last_message_id = last_saved_news.message_id if last_saved_news else 0
+#                     print(f"🧾 Последний сохранённый message_id: {last_message_id}")
+#
+#                     newest_message = None
+#
+#                     for message in reversed(messages):
+#                         temp_post_photo_base64_str = None
+#                         if not message.text:
+#                             continue
+#                         if int(message.id) <= int(last_message_id):
+#                             continue
+#
+#                         if message.photo:
+#                             file_path = app.download_media(message.photo.file_id, file_name="temp_post_photo.jpg")
+#                             with open(file_path, "rb") as f:
+#                                 temp_post_photo_base64_str = base64.b64encode(f.read()).decode("utf-8")
+#                             os.remove(file_path)
+#
+#                         new_post[tg_channel_name].append({
+#                             'message_id': message.id,
+#                             'message_date': message.date,
+#                             'message_text': message.text,
+#                             'message_photo': temp_post_photo_base64_str[:20] if temp_post_photo_base64_str else None
+#                         })
+#
+#                         newest_message = message
+#
+#                     if newest_message:
+#                         new_news = LastNews(
+#                             message_id=newest_message.id,
+#                             source_id=src['id'],
+#                             description=newest_message.text,
+#                             pub_date=newest_message.date,
+#                             title=newest_message.text,
+#                             photo=temp_post_photo_base64_str
+#                         )
+#                         session.add(new_news)
+#                         session.commit()
+#                         print(f"\n💾 Сохранено новое сообщение с ID {newest_message.id}")
+#                     else:
+#                         print("📭 Нет новых сообщений")
+#                     result.append(new_post)
+#
+#                 return result
+#
+#             except Exception as e:
+#                 session.rollback()
+#                 print("❌ Ошибка при получении сообщений:", e)
+#             finally:
+#                 session.close()
 
 
 # print('Общий результат: ', get_text_media())
@@ -247,59 +206,3 @@ def get_text_media1(channel=CHANNEL, limit=3, channel_id=1):
 
 
 # get_text_media1()
-
-# Работа с БД
-
-
-def create_tables():
-    db_manager.init_db()
-    engine = db_manager.engine
-    Base.metadata.drop_all(engine)
-    engine.echo = True
-    Base.metadata.create_all(engine)
-    engine.echo = True
-
-
-# create_tables()
-
-def add_values_into_tables():
-    db_manager.init_db()
-    with db_manager.session() as session:
-        user1 = User(tg_id=1, name='Asadbek', login='qwerty', password='qwerty')
-        bot1 = BotStorage(bot_key=1234)
-        channel1 = Channel(channel_username='channel_with_autoposting', bot_id=1, user_id=1)
-        source_type_1 = SourceType(type_name='Тг канал')
-        source_type_2 = SourceType(type_name='RSS лента')
-        source1 = Source(source_name='LCG_KZN', type_id=1, channel_id=1)
-        session.add_all([user1, bot1, channel1, source_type_1, source_type_2, source1])
-        # flush отправляет запрос в базу данных
-        # После flush каждый из работников получает первичный ключ id, который отдала БД
-        # session.flush()
-        session.commit()
-
-
-# add_values_into_tables()
-
-def get_channel_of_source():
-    db_manager.init_db()
-    with db_manager.session() as session:
-        query = (
-            select(Source)
-            .options(joinedload(Source.source_channel))
-        )
-        res = session.execute(query)
-        result = res.unique().scalars().all()
-        print(result[0].source_channel)
-
-
-# get_channel_of_source()
-
-def queries():
-    db_manager.init_db()
-    with db_manager.session() as session:
-        query_for_avatar = session.execute(
-            select(Source).filter(Source.source_name == 'english2020easy')).scalars().first()
-
-        print(query_for_avatar.source_photo)
-
-# queries()

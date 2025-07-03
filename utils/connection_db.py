@@ -1,7 +1,6 @@
+import psycopg2
 from loguru import logger
-from sqlalchemy.orm import sessionmaker, Mapped, mapped_column
 from .config import settings
-from sqlalchemy import create_engine, String
 
 def connection_db():
     dbname = settings.DB_NAME
@@ -10,13 +9,15 @@ def connection_db():
     host = settings.DB_HOST
     port = settings.DB_PORT
     try:
-        # for creating connection string
-        connection_str = f'postgresql://{user}:{password}@{host}:{port}/{dbname}'
-        # SQLAlchemy engine
-        engine = create_engine(connection_str)
-        # you can test if the connection is made or not
-        Session = sessionmaker(engine)
-        return Session
+        connection = psycopg2.connect(
+            host=host,
+            user=user,
+            password=password,
+            dbname=dbname,
+            port=port
+        )
+        logger.info("Successfully connected to PostgreSQL")
+        return connection
 
     except Exception as ex:
         logger.error(f'Sorry failed to connect: {ex}')

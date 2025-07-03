@@ -1,10 +1,12 @@
-# domain/channels/dal.py
 from loguru import logger
-from sqlalchemy.orm import Session
+from sqlalchemy import select, and_
 
+from domain.channels.base_model import Channel
+from domain.source_type.base_model import SourceType
+from domain.sources.base_model import Source
 from utils.connection_db import connection_db
 from utils.data_state import DataState, DataSuccess, DataFailedMessage
-from .base_model import Channel
+
 
 
 class ChannelDAL:
