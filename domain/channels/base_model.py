@@ -4,6 +4,7 @@ from sqlalchemy.orm import relationship, Mapped
 from ..botstorages.base_model import BotStorage
 from domain.base import Base
 from ..users.base_model import User
+from ..keywords.base_model import Keyword
 
 
 class Channel(Base):
@@ -19,3 +20,4 @@ class Channel(Base):
     channel_bot: Mapped["BotStorage"] = relationship(back_populates='bot_channels')
     channel_user: Mapped["User"] = relationship(back_populates='user_channels')
     channel_schedules: Mapped[list["Schedule"]] = relationship(back_populates='schedule_channel')
+    channel_keywords: Mapped[list["Keyword"]] = relationship(back_populates='keywords_channel')

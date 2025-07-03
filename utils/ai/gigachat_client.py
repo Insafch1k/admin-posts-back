@@ -1,7 +1,7 @@
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 from langchain_gigachat.chat_models import GigaChat
 from .ai_api import system_prompt
-from ..utils.config import settings
+from utils.config import settings
 import gigachat.context
 from .ai_api import system_prompt
 from dotenv import load_dotenv, find_dotenv
