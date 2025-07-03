@@ -5,7 +5,6 @@ import io
 import base64
 from pyrogram import Client
 from decouple import config
-from sqlalchemy import text
 
 # Создаём папку для медиа, если не существует
 MEDIA_FOLDER = os.path.join('downloads', 'media')
@@ -190,19 +189,82 @@ def download_avatar_to_base64(app, tg_channel_name):
 
 # Работа с тг-каналом
 #
-CHANNEL = "english2020easy"
+CHANNEL = "artemshumeiko"
 
 
 def get_text_media1(channel=CHANNEL, limit=3, channel_id=1):
     with app:
         print(f"Парсинг канала: {channel}")
-        # for message in app.get_chat_history(channel, limit):
-        #     print(message)
-            # if message.text:
-            #     print(f"\n🧾 ID сообщения: {message.id}")
-            #     print(f"[{message.date}] \ntext: {message.text}")
-        chat = app.get_chat(channel)
-        print(chat.title)
+        for message in app.get_chat_history(channel, limit):
+            print(message)
+            if message.text:
+                print(f"\n🧾 ID сообщения: {message.id}")
+                print(f"[{message.date}] \ntext: {message.text}")
+        # chat = app.get_chat(channel)
+        # print(chat.title)
 
 
 # get_text_media1()
+
+# from domain.last_news.dal import LastNewsDAL
+#
+# lsd = LastNewsDAL()
+# lsd.get_last_news_by_source_id(1)
+
+# Работа с БД
+
+
+# def create_tables():
+#     import domain
+#     Session, engine = connection_db()
+#     Base.metadata.drop_all(engine)
+#     engine.echo = True
+#     Base.metadata.create_all(engine)
+#     engine.echo = True
+#
+#
+# create_tables()
+
+# def add_values_into_tables():
+#     import domain
+#     Session, engine = connection_db()
+#     with Session() as session:
+#         user1 = User(tg_id=1, name='Asadbek', login='qwerty', password='qwerty')
+#         bot1 = BotStorage(bot_key=1234)
+#         channel1 = Channel(channel_username='channel_with_autoposting', bot_id=1, user_id=1)
+#         source_type_1 = SourceType(type_name='Тг канал')
+#         source_type_2 = SourceType(type_name='RSS лента')
+#         source1 = Source(source_name='LCG_KZN', type_id=1, channel_id=1)
+#         source2 = Source(source_name='english2020easy', type_id=1, channel_id=1)
+#         session.add_all([user1, bot1, channel1, source_type_1, source_type_2, source1, source2])
+#         # flush отправляет запрос в базу данных
+#         # После flush каждый из работников получает первичный ключ id, который отдала БД
+#         # session.flush()
+#         session.commit()
+#
+#
+# add_values_into_tables()
+
+# def get_channel_of_source():
+#     db_manager.init_db()
+#     with db_manager.session() as session:
+#         query = (
+#             select(Source)
+#             .options(joinedload(Source.source_channel))
+#         )
+#         res = session.execute(query)
+#         result = res.unique().scalars().all()
+#         print(result[0].source_channel)
+#
+#
+# # get_channel_of_source()
+#
+# def queries():
+#     db_manager.init_db()
+#     with db_manager.session() as session:
+#         query_for_avatar = session.execute(
+#             select(Source).filter(Source.source_name == 'english2020easy')).scalars().first()
+#
+#         print(query_for_avatar.source_photo)
+#
+# # queries()
