@@ -7,6 +7,5 @@ from .channels.base_model import Channel
 from .images.base_model import Image
 from .last_news.base_model import LastNews
 from .prompts.base_model import Prompt
-from .schedules.base_model import Schedule
 from .source_type.base_model import SourceType
 from .styles.base_model import Style

@@ -5,5 +5,6 @@ from typing import Optional
 class ScheduleSchema(BaseModel):
     schedule_id: int
     channel_id: int
+    post_id: int
     publish_time: datetime
-    is_published: bool
+    published_at: Optional[datetime]

@@ -1,9 +1,6 @@
 from flask import Blueprint, jsonify, request
-from domain.channels.bl import ChannelBL
-from utils.data_state import DataState
-from domain.keywords.dal import KeywordDAL
-from domain.styles.dal import StyleDAL
 from utils.ai.gigachat_client import GigaChatManager
+from domain.schedules.bl import ScheduleBL
 
 posts_bp = Blueprint('posts', __name__, url_prefix='/posts')
 
