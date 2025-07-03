@@ -1,53 +1,82 @@
+from psycopg2.extras import RealDictCursor
 from sqlalchemy import select, and_
-
-from domain.source_type.base_model import SourceType
-from domain.sources.base_model import Source
 from utils.connection_db import connection_db
 from utils.data_state import DataFailedMessage
 
 
 class SourecDAL:
-    def get_sources_by_channel_id(self, channel_id: int):  # ← добавлен self
-        Session = connection_db()
-        if Session is None:
-            return DataFailedMessage(error_message='Ошибка в работе базы данных!')
+    @staticmethod
+    def get_sources_by_channel_id(channel_id: int):
+        try:
+            connection = connection_db()
+            if connection is None:
+                return DataFailedMessage(error_message='Ошибка в работе базы данных!')
 
-        with Session() as session:
-            if session is None:
-                print("❌ Ошибка инициализации БД")
-                return []
+            with connection.cursor(cursor_factory=RealDictCursor) as cursor:
+                # Получаем type_id для "Тг канал"
+                sql = "SELECT type_id FROM source_type WHERE type_name = 'Тг канал'"
+                cursor.execute(sql)
+                data = cursor.fetchone()
+                if data is None:
+                    print("❌ Не найден тип 'Тг канал'")
+                    return []
 
-            result = session.execute(
-                select(SourceType.type_id).filter(SourceType.type_name == 'Тг канал')
-            ).scalar()
+                id_of_news_type = data['type_id']
 
-            if result is None:
-                print("❌ Не найден тип 'Тг канал'")
-                return []
+                # Параметризованный запрос
+                sql1 = '''
+                SELECT source_id, source_name 
+                FROM sources 
+                WHERE channel_id = %(channel_id)s AND type_id = %(type_id)s
+                '''
+                cursor.execute(sql1, {'channel_id': channel_id, 'type_id': id_of_news_type})
+                sources = cursor.fetchall()
+                return [dict(s) for s in sources]
+        except Exception as e:
+            return {"error": str(e)}
 
-            id_of_news_type = result
+    @staticmethod
+    def get_source_by_source_name(source_name):
+        try:
+            connection = connection_db()
+            if connection is None:
+                return DataFailedMessage(error_message='Ошибка в работе базы данных!')
 
-            stmt = select(Source.source_id, Source.source_name).filter(
-                and_(
-                    Source.channel_id == channel_id,
-                    Source.type_id == id_of_news_type
-                )
-            )
+            with connection.cursor(cursor_factory=RealDictCursor) as cursor:
+                sql = 'SELECT * FROM sources WHERE source_name = %(source_name)s'
+                cursor.execute(sql, {'source_name': source_name})
+                source = cursor.fetchone()
+            return dict(source) if source else None
 
-            sources = session.execute(stmt).all()
-            return [{"id": s.source_id, "name": s.source_name} for s in sources]
+        except Exception as e:
+            return {"error": str(e)}
 
-    def get_source_by_source_name(self, source_name):
-        Session = connection_db()
-        if Session is None:
-            return DataFailedMessage(error_message='Ошибка в работе базы данных!')
+    @staticmethod
+    def update_sources_values(source_id: int, updates: dict):
+        try:
+            connection = connection_db()
+            if connection is None:
+                return DataFailedMessage(error_message='Ошибка в работе базы данных!')
 
-        with Session() as session:
-            source = session.execute(
-                select(Source).filter(Source.source_name == source_name)
-            ).scalars().first()
-        return source if source else None
+            with connection.cursor(cursor_factory=RealDictCursor) as cursor:
+                # Построение части запроса SET col1 = %(col1)s, col2 = %(col2)s ...
+                set_clause = ', '.join([f"{key} = %({key})s" for key in updates.keys()])
+                query = f"""
+                    UPDATE sources
+                    SET {set_clause}
+                    WHERE source_id = %(source_id)s
+                    RETURNING *;
+                """
+                # Добавляем source_id к параметрам
+                updates['source_id'] = source_id
+                cursor.execute(query, updates)
+                connection.commit()
+                return cursor.fetchone()
+        except Exception as e:
+            return {"error": str(e)}
+
 
 
 chan_dal = SourecDAL()
-print(chan_dal.get_sources_by_channel_id(1))
+# print(chan_dal.get_sources_by_channel_id(6))
+# print(chan_dal.get_source_by_source_name('artemshumeiko'))
