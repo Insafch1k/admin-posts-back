@@ -1,5 +1,6 @@
 from domain.schedules.dal import ScheduleDAL
 from domain.schedules.schemas import ScheduleSchema
+from collections import OrderedDict
 
 class ScheduleBL:
     @staticmethod
@@ -16,13 +17,14 @@ class ScheduleBL:
             for schedule in raw_posts
         ]
 
+
 def format_schedule_for_frontend(schedules):
     posts = []
     for schedule in schedules:
         publish_time = schedule.publish_time
-        posts.append({
-            "name": f"{schedule.post_id} пост",
-            "time": publish_time.strftime("%H:%M"),
-            "date": publish_time.strftime("%d.%m")
-        })
-    return {"posts": posts}
+        posts.append(OrderedDict([
+            ("name", f"{schedule.post_id} пост"),
+            ("time", publish_time.strftime("%H:%M")),
+            ("date", publish_time.strftime("%d.%m"))
+        ]))
+    return posts

@@ -1,7 +1,6 @@
 from sqlalchemy.orm import Session
 from utils.connection_db import connection_db
-from .base_model import Style
-from domain.prompts import Prompt, PromptSchema
+from domain.prompts import PromptSchema
 from .schemas import StyleSchema
 from utils.data_state import DataState, DataSuccess, DataFailedMessage
 from loguru import logger

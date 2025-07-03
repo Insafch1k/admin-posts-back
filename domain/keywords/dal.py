@@ -3,7 +3,6 @@ from sqlalchemy.orm import Session
 from typing import List
 from loguru import logger
 from utils.connection_db import connection_db
-from .base_model import Keyword
 from .schemas import KeywordSchema
 from utils.data_state import DataState, DataSuccess, DataFailedMessage
 from utils.connection_db import connection_db

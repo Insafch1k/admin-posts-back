@@ -27,8 +27,6 @@ async def main():
         setup_scheduler(bot)
     except Exception as e:
         logging.error(f"Failed to setup scheduler: {e}")
-        # Decide if you want to continue without the scheduler
-        # For this use case, probably not.
         return
 
     # Перед запуском polling'а удаляем вебхук, чтобы избежать конфликтов

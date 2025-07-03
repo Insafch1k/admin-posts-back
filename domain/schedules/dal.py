@@ -1,5 +1,5 @@
 import logging
-from domain.database import db_manager
+from utils.connection_db import connection_db
 
 class ScheduleDAL:
     @staticmethod
@@ -9,7 +9,7 @@ class ScheduleDAL:
         """
         conn = None
         try:
-            conn = get_db_connection()
+            conn = connection_db()
             cur = conn.cursor()
             cur.execute("SELECT schedule_id, channel_id, post_id, publish_time, published_at FROM schedules WHERE channel_id = %s", (channel_id,))
             rows = cur.fetchall()

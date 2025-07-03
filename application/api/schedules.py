@@ -3,6 +3,7 @@ from domain.schedules.bl import ScheduleBL, format_schedule_for_frontend
 
 schedules_bp = Blueprint('schedules', __name__, url_prefix='/schedules')
 
+
 @schedules_bp.route('/schedule', methods=['GET'])
 def get_posts_schedule_route():
     try:
@@ -11,8 +12,7 @@ def get_posts_schedule_route():
             schedule = ScheduleBL.get_posts_schedule_by_channel(int(channel_id))
         else:
             schedule = ScheduleBL.get_posts_schedule()
-        from domain.schedules.bl import format_schedule_for_frontend
-        response = format_schedule_for_frontend(schedule)
-        return jsonify(response)
+        posts = format_schedule_for_frontend(schedule)
+        return jsonify({"posts": posts})
     except Exception as e:
         return jsonify({"error": str(e), "data": None}), 500
