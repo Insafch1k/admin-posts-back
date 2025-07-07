@@ -4,22 +4,20 @@ from typing import List
 from utils.connection_db import connection_db
 
 class PostsDAL:
+    @staticmethod
     def get_all_unpublished_posts() -> List[dict]:
-        """
-        Получает все посты, которые ещё не были опубликованы
-        """
         conn = None
         try:
             conn = connection_db()
             cur = conn.cursor()
-            cur.execute("SELECT post_id, channel_id, content_text, scheduled_time, published_at FROM posts WHERE published_at IS NULL")
+            cur.execute("SELECT post_id, channel_id, content_name, scheduled_time, published_at FROM posts WHERE published_at IS NULL")
             rows = cur.fetchall()
             posts = []
             for row in rows:
                 posts.append({
                     "post_id": row[0],
                     "channel_id": row[1],
-                    "content_text": row[2],
+                    "content_name": row[2],
                     "scheduled_time": row[3],
                     "published_at": row[4]
                 })
@@ -32,10 +30,8 @@ class PostsDAL:
             if conn:
                 conn.close()
 
+    @staticmethod
     def mark_post_as_published(post_id: int) -> bool:
-        """
-        Помечает пост как опубликованный и устанавливает текущее время
-        """
         conn = None
         try:
             conn = connection_db()
@@ -57,16 +53,14 @@ class PostsDAL:
             if conn:
                 conn.close()
 
+    @staticmethod
     def get_post_by_id(post_id: int) -> dict:
-        """
-        Получает один пост по его ID
-        """
         conn = None
         try:
             conn = connection_db()
             cur = conn.cursor()
             cur.execute(
-                "SELECT post_id, channel_id, content_text, scheduled_time, published_at FROM posts WHERE post_id = %s",
+                "SELECT post_id, channel_id, content_name, scheduled_time, published_at FROM posts WHERE post_id = %s",
                 (post_id,))
             row = cur.fetchone()
             cur.close()
@@ -74,7 +68,7 @@ class PostsDAL:
                 return {
                     "post_id": row[0],
                     "channel_id": row[1],
-                    "content_text": row[2],
+                    "content_name": row[2],
                     "scheduled_time": row[3],
                     "published_at": row[4]
                 }
@@ -92,14 +86,15 @@ class PostsDAL:
         try:
             conn = connection_db()
             cur = conn.cursor()
-            set_clause = ','.join([f"{key} = %s" for key in updates.keys()])
+            set_clause = ', '.join([f"{key} = %s" for key in updates.keys()])
             values = list(updates.values())
             values.append(post_id)
             query = f"UPDATE posts SET {set_clause} WHERE post_id = %s"
             cur.execute(query, values)
             conn.commit()
+            updated = cur.rowcount
             cur.close()
-            return True
+            return updated > 0
         except Exception as e:
             logging.error(f"Error updating post {post_id}: {e}")
             if conn:

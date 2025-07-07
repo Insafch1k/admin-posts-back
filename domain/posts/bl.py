@@ -6,7 +6,7 @@ class PostsBL:
     def update_post(post_id, name=None, date=None, time_=None):
         updates = {}
         if name:
-            updates['content_text'] = name
+            updates['content_name'] = name
         if date and time_:
             date_part = datetime.strptime(date, '%d.%m')
             time_part = datetime.strptime(time_, '%H:%M').time()
