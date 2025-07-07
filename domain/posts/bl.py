@@ -15,3 +15,15 @@ class PostsBL:
             return False, 'No fields to update'
         success = PostsDAL.update_post(post_id, updates)
         return success, None if success else 'Update failed'
+
+    @staticmethod
+    def create_post(channel_id, prompt_id, content_name, content_text, date, time_):
+        try:
+            date_part = datetime.strptime(date, "%d.%m")
+            time_part = datetime.strptime(time_, "%H:%M").time()
+            scheduled_time = datetime.combine(date_part.replace(year=datetime.now().year), time_part)
+        except Exception as e:
+            return False
+
+        success = PostsDAL.create_post(channel_id, prompt_id, content_name, content_text, scheduled_time)
+        return success

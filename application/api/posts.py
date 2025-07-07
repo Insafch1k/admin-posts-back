@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request
 from utils.ai.gigachat_client import GigaChatManager
 from domain.schedules.bl import ScheduleBL
 from domain.posts.bl import PostsBL
+from datetime import datetime
 
 posts_bp = Blueprint('posts', __name__, url_prefix='/posts')
 
@@ -46,3 +47,19 @@ def update_post():
     if not success:
         return jsonify({'success': False, 'error': error}), 400
     return jsonify({'success': True})
+
+@posts_bp.route('/create', methods=['POST'])
+def create_post():
+    data = request.get_json()
+    channel_id = data.get('channel_id')
+    prompt_id = data.get('prompt_id')
+    content_name = data.get('content_name')
+    content_text = data.get('content_text')
+    date = data.get('date')
+    time_ = data.get('time')
+
+    if not (channel_id and prompt_id and content_name and content_text and date and time_):
+        return jsonify({'success': False, 'error': 'Missing required fields'}), 400
+
+    success = PostsBL.create_post(channel_id, prompt_id, content_name, content_text, date, time_)
+    return jsonify({'success': success})

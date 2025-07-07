@@ -103,3 +103,25 @@ class PostsDAL:
         finally:
             if conn:
                 conn.close()
+
+    @staticmethod
+    def create_post(channel_id: int, prompt_id: int, content_name: str, content_text: str, scheduled_time: datetime) -> bool:
+        conn = None
+        try:
+            conn = connection_db()
+            cur = conn.cursor()
+            cur.execute(
+                "INSERT INTO posts (channel_id, prompt_id, content_name, content_text, scheduled_time) VALUES (%s, %s, %s, %s, %s)",
+                (channel_id, prompt_id, content_name, content_text, scheduled_time)
+            )
+            conn.commit()
+            cur.close()
+            return True
+        except Exception as e:
+            logging.error(f"Error creating post: {e}")
+            if conn:
+                conn.rollback()
+            return False
+        finally:
+            if conn:
+                conn.close()
