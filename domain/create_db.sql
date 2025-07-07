@@ -80,3 +80,10 @@ CREATE TABLE posts (
     published_at TIMESTAMP,
     scheduled_time TIMESTAMP
 );
+
+CREATE TABLE schedule_settings (
+    channel_id BIGINT PRIMARY KEY REFERENCES channels(channel_id),
+    duplication BOOLEAN DEFAULT FALSE,
+    dublication_week BOOLEAN DEFAULT FALSE,
+    random BOOLEAN DEFAULT FALSE
+);

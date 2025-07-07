@@ -1,19 +1,20 @@
 import asyncio
 import logging
 from aiogram import Bot, Dispatcher
-from utils.config import settings
 from application.bot_service.scheduler import setup_scheduler
-from domain.database import db_manager
+from utils.connection_db import connection_db
+from utils.config import settings
+
 
 async def main():
     """
     Главная функция для запуска бота.
     """
     logging.basicConfig(level=logging.INFO)
-    
+
     # Инициализация подключения к БД
     try:
-        db_manager.init_db()
+        connection_db()
         logging.info("Database connection initialized.")
     except Exception as e:
         logging.error(f"Could not initialize database connection: {e}")
@@ -27,15 +28,14 @@ async def main():
         setup_scheduler(bot)
     except Exception as e:
         logging.error(f"Failed to setup scheduler: {e}")
-        # Decide if you want to continue without the scheduler
-        # For this use case, probably not.
         return
 
     # Перед запуском polling'а удаляем вебхук, чтобы избежать конфликтов
     await bot.delete_webhook(drop_pending_updates=True)
-    
+
     logging.info("Starting bot polling...")
     await dp.start_polling(bot)
+
 
 def run_bot():
     """
