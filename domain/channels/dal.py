@@ -1,6 +1,7 @@
 from loguru import logger
 from sqlalchemy import select, and_
 
+
 from utils.connection_db import connection_db
 from utils.data_state import DataState, DataSuccess, DataFailedMessage
 
