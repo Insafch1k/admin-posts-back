@@ -85,3 +85,26 @@ class PostsDAL:
         finally:
             if conn:
                 conn.close()
+
+    @staticmethod
+    def update_post(post_id: int, updates:dict) -> bool:
+        conn = None
+        try:
+            conn = connection_db()
+            cur = conn.cursor()
+            set_clause = ','.join([f"{key} = %s" for key in updates.keys()])
+            values = list(updates.values())
+            values.append(post_id)
+            query = f"UPDATE posts SET {set_clause} WHERE post_id = %s"
+            cur.execute(query, values)
+            conn.commit()
+            cur.close()
+            return True
+        except Exception as e:
+            logging.error(f"Error updating post {post_id}: {e}")
+            if conn:
+                conn.rollback()
+            return False
+        finally:
+            if conn:
+                conn.close()
