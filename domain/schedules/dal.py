@@ -1,5 +1,4 @@
 import logging
-from domain.database import db_manager
 
 class ScheduleDAL:
     @staticmethod

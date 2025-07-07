@@ -4,12 +4,12 @@ import schedule
 import time
 from pyrogram import Client
 from decouple import config
-from sqlalchemy import text, select, and_
 
 from domain.last_news.dal import LastNewsDAL
+from domain.sources.bl import SourceBL
 from utils.connection_db import connection_db
 from utils.data_state import DataFailedMessage
-from domain.sources.dal import SourecDAL
+from domain.sources.dal import SourceDAL
 
 # Создаём папку для медиа, если не существует
 MEDIA_FOLDER = os.path.join('downloads', 'media')
@@ -54,7 +54,7 @@ def get_text_media(limit=10, channel_id=6):
         return DataFailedMessage(error_message='Ошибка в работе базы данных!')
 
     with app:  # ✅ Только один раз
-        sources = SourecDAL.get_sources_by_channel_id(channel_id)
+        sources = SourceBL.get_sources_by_channel_id(channel_id)
         result = []
         try:
             for src in sources:
@@ -65,15 +65,15 @@ def get_text_media(limit=10, channel_id=6):
                 # Загрузка фото канала
                 tg_channel_avatar, tg_channel_title = download_avatar_to_base64(app, tg_channel_name)
 
-                query_for_avatar = SourecDAL.get_source_by_source_name(tg_channel_name)
+                query_for_avatar = SourceDAL.get_source_by_source_name(tg_channel_name)
 
                 if query_for_avatar and tg_channel_avatar and (
                         query_for_avatar['source_photo'] is None or query_for_avatar['source_photo'] != tg_channel_avatar):
-                    SourecDAL.update_sources_values(source_id=src['source_id'], updates={'source_photo': tg_channel_avatar})
+                    SourceDAL.update_sources_values(source_id=src['source_id'], updates={'source_photo': tg_channel_avatar})
 
                 if query_for_avatar and tg_channel_title and (
                         query_for_avatar['source_title'] is None or query_for_avatar['source_title'] != tg_channel_title):
-                    SourecDAL.update_sources_values(source_id=src['source_id'], updates={'source_title': tg_channel_title})
+                    SourceDAL.update_sources_values(source_id=src['source_id'], updates={'source_title': tg_channel_title})
 
                 messages = list(app.get_chat_history(tg_channel_name, limit=limit))
 

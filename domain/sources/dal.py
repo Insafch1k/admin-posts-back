@@ -4,7 +4,7 @@ from utils.connection_db import connection_db
 from utils.data_state import DataFailedMessage
 
 
-class SourecDAL:
+class SourceDAL:
     @staticmethod
     def get_sources_by_channel_id(channel_id: int):
         try:
@@ -25,13 +25,13 @@ class SourecDAL:
 
                 # Параметризованный запрос
                 sql1 = '''
-                SELECT source_id, source_name 
+                SELECT source_id, source_name, source_title, rss_url, source_photo
                 FROM sources 
                 WHERE channel_id = %(channel_id)s AND type_id = %(type_id)s
                 '''
                 cursor.execute(sql1, {'channel_id': channel_id, 'type_id': id_of_news_type})
                 sources = cursor.fetchall()
-                return [dict(s) for s in sources]
+                return sources
         except Exception as e:
             return {"error": str(e)}
 
@@ -77,6 +77,6 @@ class SourecDAL:
 
 
 
-chan_dal = SourecDAL()
+chan_dal = SourceDAL()
 # print(chan_dal.get_sources_by_channel_id(6))
 # print(chan_dal.get_source_by_source_name('artemshumeiko'))
