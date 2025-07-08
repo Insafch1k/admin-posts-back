@@ -22,5 +22,3 @@ def connection_db():
     except Exception as ex:
         logger.error(f'Sorry failed to connect: {ex}')
         return None
-
-
