@@ -18,8 +18,8 @@ def get_sources_by_channel_id(channel_id):
 def add_new_source():
     try:
         data = request.get_json()
-        content = data.get('url')
-        print(content)
+
+        print(data, type(data))
         return jsonify({'success': True, 'response': 'Source was successfully added!'})
     except Exception as e:
         return jsonify({'success': False, 'response': str(e)})

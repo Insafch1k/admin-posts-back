@@ -17,10 +17,10 @@ class Settings(BaseSettings):
     AUTH: str
 
     class Config:
-        env_file = ".env"
+        env_file = find_dotenv()
         env_file_encoding = "utf-8"
         case_sensitive = True
 
 settings = Settings()
 
-# print(settings.dict())
+print(settings)

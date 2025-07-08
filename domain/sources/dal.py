@@ -75,6 +75,10 @@ class SourceDAL:
         except Exception as e:
             return {"error": str(e)}
 
+    @staticmethod
+    def add_source(channel_id: int, data):
+        pass
+
 
 
 chan_dal = SourceDAL()
