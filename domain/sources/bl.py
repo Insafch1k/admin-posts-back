@@ -1,6 +1,6 @@
 from domain.sources.dal import SourceDAL
 from domain.sources.schemas import SourceSchemaOut
-from utils.downloads.work_with_photo import download_avatar_to_base64, app
+from utils.downloads.work_with_photo import tg_app, download_avatar_to_base64
 
 
 def detect_link_type(url: str) -> str:
@@ -27,20 +27,41 @@ class SourceBL:
         if detect_link_type(data['url']) == 'rss_url':
             pass
         elif detect_link_type(data['url']) == "tg_url":
+            print('tg_url')
             source_name = data['url'].rsplit('/', 1)[-1]
-            with app:
-                source_photo, source_title = download_avatar_to_base64(source_name, app)
-                res = SourceDAL.add_source({
-                    'source_name': source_name,
-                    'type_id': 1,
-                    'rss_url': data['url'],
-                    'channel_id': data['channel_id'],
-                    'source_title': source_title,
-                    'source_photo': source_photo
-                })
-                return res
+            try:
+                source_photo, source_title = download_avatar_to_base64(source_name)
+                if source_photo or source_title:
+                    res = SourceDAL.add_source({
+                        'source_name': source_name,
+                        'type_id': 1,
+                        'rss_url': data['url'],
+                        'channel_id': data['channel_id'],
+                        'source_title': source_title,
+                        'source_photo': source_photo
+                    })
+                    return res
+            except Exception as e:
+                return e
         else:
-            return None
+            raise Exception("Некорректная ссылка была передана!")
+
+    @staticmethod
+    def update_sources(source_id, updates):
+        res = SourceDAL.update_sources_values(source_id, updates)
+        if res:
+            return dict(res)['source_id']
+        else:
+            raise Exception("Не удалось обновить данные!")
 
 
-# print(SourceBL.add_source({"channel_id": 1, "url": "https://t.me/crypto_vestnic"}))
+    @staticmethod
+    def delete_source(source_id):
+        res = SourceDAL.delete_source(source_id)
+        if res:
+            return res
+        else:
+            raise Exception("Не удалось удалить данные!")
+
+
+# print(SourceBL.add_source({"channel_id": 6, "url": "https://t.me/crypto_vestnic"}))

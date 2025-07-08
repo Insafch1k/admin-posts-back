@@ -76,6 +76,7 @@ class SourceDAL:
 
     @staticmethod
     def add_source(data):
+        print('dal')
         try:
             connection = connection_db()
             if connection is None:
@@ -92,16 +93,39 @@ class SourceDAL:
                 query = f"""
                         INSERT INTO sources ({', '.join(fields)})
                         VALUES ({', '.join(placeholders)})
-                        RETURNING id;
+                        RETURNING source_id;
                     """
                 cursor.execute(query, values)
-                inserted_id = cursor.fetchone()[0]
-                cursor.commit()
-                return inserted_id
+                inserted_id = cursor.fetchone()
+                connection.commit()
+                return inserted_id['source_id']
+        except Exception as e:
+            return {"error": str(e)}
+
+
+    @staticmethod
+    def delete_source(source_id):
+        try:
+            connection = connection_db()
+            if connection is None:
+                return DataFailedMessage(error_message='Ошибка в работе базы данных!')
+            query = """DELETE FROM sources
+                       WHERE source_id = %(source_id)s;"""
+            with connection.cursor(cursor_factory=RealDictCursor) as cursor:
+                cursor.execute(query, {'source_id': source_id})
+                connection.commit()
+                return f'источник {source_id} был удален!'
         except Exception as e:
             return {"error": str(e)}
 
 
 # print(chan_dal.get_sources_by_channel_id(6))
 # print(chan_dal.get_source_by_source_name('artemshumeiko'))
-# print(SourceDAL.add_source())
+# print(SourceDAL.add_source({
+#                 'source_name': 'asad',
+#                 'type_id': 1,
+#                 'rss_url': 'https://t.me/crypto_vestnic',
+#                 'channel_id': 6,
+#                 'source_title': '123',
+#                 'source_photo': '123'
+#             }))

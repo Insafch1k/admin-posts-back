@@ -1,32 +1,37 @@
+import asyncio
 import base64
 import os
-from pyrogram import Client
-from decouple import config
+from utils.downloads.telegram_client_runner import tg_app, loop
 
-# Создаём сессию клиента
-api_id = config('API_ID')
-api_hash = config('API_HASH')
-phone = config('PHONE')
-login = config('LOGIN')
+def download_avatar_to_base64(tg_channel_name):
+    print('tg_photo')
+    async def _inner():
+        chat = await tg_app.get_chat(tg_channel_name)
+        if chat.photo:
+            file_path = await tg_app.download_media(chat.photo.big_file_id, file_name="temp_avatar.jpg")
+            with open(file_path, "rb") as f:
+                base64_str = base64.b64encode(f.read()).decode("utf-8")
+            os.remove(file_path)
+            return base64_str, chat.title or None
+        return None, chat.title or None
 
-app = Client(name=login, api_id=api_id, api_hash=api_hash, phone_number=phone)
+    future = asyncio.run_coroutine_threadsafe(_inner(), loop)
+    return future.result()
 
+def get_history_of_chat(tg_channel_name, limit):
+    async def _inner():
+        return await tg_app.get_chat_history(tg_channel_name, limit=limit)
 
-def download_avatar_to_base64(tg_channel_name, app=app):
-    chat = app.get_chat(tg_channel_name)
+    future = asyncio.run_coroutine_threadsafe(_inner(), loop)
+    return future.result()
 
-    if chat.photo:
-        # Шаг 1: Скачиваем фото на диск
-        file_path = app.download_media(chat.photo.big_file_id, file_name="temp_avatar.jpg")
-
-        # Шаг 2: Читаем содержимое и кодируем в base64
+def media_download(message):
+    async def _inner():
+        file_path = await tg_app.download_media(message.photo.file_id, file_name="temp_post_photo.jpg")
         with open(file_path, "rb") as f:
             base64_str = base64.b64encode(f.read()).decode("utf-8")
-
-        # Шаг 3: Удаляем временный файл
         os.remove(file_path)
-        # print(f'{base64_str[:20]=}', chat.title if chat.title else None)
-        return base64_str, chat.title if chat.title else None
-    else:
-        print("❌ У этого чата нет фото.")
-        return None, chat.title if chat.title else None
+        return base64_str
+
+    future = asyncio.run_coroutine_threadsafe(_inner(), loop)
+    return future.result()
