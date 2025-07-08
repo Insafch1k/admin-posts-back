@@ -12,7 +12,7 @@ class DatabaseManager:
     _pool = None
 
     @classmethod
-    def initialize(cls, config: Settings):
+    def initialize(cls, config: settings):
         """Инициализация пула соединений при старте приложения"""
         if cls._pool is None:
             try:

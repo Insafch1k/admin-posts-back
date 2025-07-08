@@ -1,11 +1,11 @@
 import asyncio
 from pyrogram import Client
-from decouple import config
+from utils.config import settings
 
-api_id = config('API_ID')
-api_hash = config('API_HASH')
-phone = config('PHONE')
-login = config('LOGIN')
+api_id = settings.API_ID
+api_hash = settings.API_HASH
+phone = settings.PHONE
+login = settings.LOGIN
 
 # Telegram client
 tg_app = Client(name=login, api_id=api_id, api_hash=api_hash, phone_number=phone)

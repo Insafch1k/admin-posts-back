@@ -1,7 +1,7 @@
 from datetime import datetime
 from domain.posts.dal import PostsDAL
 from utils.check_news.is_fit_post import compare_news_with_posts
-from .dal import newPostDAL
+from .dal import NewPostDAL
 from .schemas import PostSchema
 
 
@@ -39,7 +39,7 @@ class PostsBL:
 class newPostBL:
     @staticmethod
     def find_repeat_in_posts(news_text, channel_id):
-        posts = newPostDAL.get_post_by_channel_id(channel_id)
+        posts = NewPostDAL.get_post_by_channel_id(channel_id)
         print(posts)
         # compare_news_with_posts(news_text, posts)
 
