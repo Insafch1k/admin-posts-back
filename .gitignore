@@ -3,6 +3,8 @@
 venv/
 env/
 .idea
+.iml
+.xml
 # Файлы среды
 .env
 .env.local
