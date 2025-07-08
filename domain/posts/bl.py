@@ -1,5 +1,12 @@
 from datetime import datetime
 from domain.posts.dal import PostsDAL
+from utils.check_news.is_fit_post import compare_news_with_posts
+from .dal import newPostDAL
+from .schemas import PostSchema
+
+
+import time
+
 
 class PostsBL:
     @staticmethod
@@ -27,3 +34,13 @@ class PostsBL:
 
         success = PostsDAL.create_post(channel_id, prompt_id, content_name, content_text, scheduled_time)
         return success
+
+
+class newPostBL:
+    @staticmethod
+    def find_repeat_in_posts(news_text, channel_id):
+        posts = newPostDAL.get_post_by_channel_id(channel_id)
+        print(posts)
+        # compare_news_with_posts(news_text, posts)
+
+

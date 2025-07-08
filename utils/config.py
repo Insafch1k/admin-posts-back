@@ -1,13 +1,13 @@
 from dotenv import load_dotenv, find_dotenv
 from pydantic_settings import BaseSettings
 
-
+load_dotenv(find_dotenv())
 
 class Settings(BaseSettings):
     DB_NAME: str
     DB_USER: str
     DB_PASSWORD: str
-    DB_PORT: int
+    DB_PORT: str
     DB_HOST: str
     API_ID: int
     API_HASH: str
@@ -23,5 +23,3 @@ class Settings(BaseSettings):
         case_sensitive = True
 
 settings = Settings()
-
-

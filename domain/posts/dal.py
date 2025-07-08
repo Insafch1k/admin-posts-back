@@ -2,6 +2,9 @@ import logging
 from datetime import datetime, timezone
 from typing import List
 from utils.connection_db import connection_db
+from utils.database_manager import Executor
+from utils.config import Settings
+from .schemas import PostSchema
 
 class PostsDAL:
     @staticmethod
@@ -125,3 +128,22 @@ class PostsDAL:
         finally:
             if conn:
                 conn.close()
+
+
+class NewPostDAL(Executor):
+    @staticmethod
+    def get_post_by_channel_id(channel_id: int) -> dict:
+        try:
+            query = """
+                    SELECT *
+                    FROM posts
+                    WHERE channel_id = %s"""
+            result = newPostDAL._execute_query(query=query, params=channel_id, fetchall=True)
+            if result:
+                result = [PostSchema(**res) for res in result]
+            return result
+        except:
+            logging.error(f"Error fetching post by channel id: {channel_id}")
+            raise
+
+
