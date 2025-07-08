@@ -76,6 +76,7 @@ CREATE TABLE posts (
     schedule_id INT REFERENCES schedules(schedule_id),
     user_id INT REFERENCES users(user_id),
     content_text TEXT,
+    content_name TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     published_at TIMESTAMP,
     scheduled_time TIMESTAMP
