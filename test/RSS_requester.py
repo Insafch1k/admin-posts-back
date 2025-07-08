@@ -1,5 +1,5 @@
 import pytest
-from utils.web_requester.requester import RSS_requester
+from utils.rss.requester import RSS_requester
 from pydantic_core import ValidationError
 from requests.exceptions import HTTPError, Timeout
 
