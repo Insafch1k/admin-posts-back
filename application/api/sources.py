@@ -18,8 +18,10 @@ def get_sources_by_channel_id(channel_id):
 def add_new_source():
     try:
         data = request.get_json()
-
-        print(data, type(data))
-        return jsonify({'success': True, 'response': 'Source was successfully added!'})
+        res = SourceBL.add_source(data)
+        if res:
+            return jsonify({'success': True, 'response': f'Source was successfully added with id {res} !'})
+        else:
+            return jsonify({'success': False, 'response': 'Something went wrong!'})
     except Exception as e:
         return jsonify({'success': False, 'response': str(e)})

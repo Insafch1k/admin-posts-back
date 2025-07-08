@@ -2,53 +2,22 @@ import base64
 import os
 import schedule
 import time
-from pyrogram import Client
-from decouple import config
 
 from domain.last_news.dal import LastNewsDAL
-from domain.sources.bl import SourceBL
+
 from utils.connection_db import connection_db
 from utils.data_state import DataFailedMessage
 from domain.sources.dal import SourceDAL
+from utils.downloads.work_with_photo import download_avatar_to_base64, app
 
 # Создаём папку для медиа, если не существует
 MEDIA_FOLDER = os.path.join('downloads', 'media')
 if not os.path.exists(MEDIA_FOLDER):
     os.makedirs(MEDIA_FOLDER, exist_ok=True)
 
-# Создаём сессию клиента
-api_id = config('API_ID')
-api_hash = config('API_HASH')
-phone = config('PHONE')
-login = config('LOGIN')
-
-app = Client(name=login, api_id=api_id, api_hash=api_hash, phone_number=phone)
-
-
-def download_avatar_to_base64(app, tg_channel_name):
-    chat = app.get_chat(tg_channel_name)
-
-    if chat.photo:
-        # Шаг 1: Скачиваем фото на диск
-        file_path = app.download_media(chat.photo.big_file_id, file_name="temp_avatar.jpg")
-
-        # Шаг 2: Читаем содержимое и кодируем в base64
-        with open(file_path, "rb") as f:
-            base64_str = base64.b64encode(f.read()).decode("utf-8")
-
-        # Шаг 3: Удаляем временный файл
-        os.remove(file_path)
-        # print(f'{base64_str[:20]=}', chat.title if chat.title else None)
-        return base64_str, chat.title if chat.title else None
-    else:
-        print("❌ У этого чата нет фото.")
-        return None, chat.title if chat.title else None
-
-
-# download_avatar_to_base64()
-
 
 def get_text_media(limit=10, channel_id=6):
+    from domain.sources.bl import SourceBL
     Session = connection_db()
     if Session is None:
         return DataFailedMessage(error_message='Ошибка в работе базы данных!')
@@ -63,17 +32,21 @@ def get_text_media(limit=10, channel_id=6):
                 print(f"📡 Парсинг канала: {tg_channel_name}")
 
                 # Загрузка фото канала
-                tg_channel_avatar, tg_channel_title = download_avatar_to_base64(app, tg_channel_name)
+                tg_channel_avatar, tg_channel_title = download_avatar_to_base64(tg_channel_name, app)
 
                 query_for_avatar = SourceDAL.get_source_by_source_name(tg_channel_name)
 
                 if query_for_avatar and tg_channel_avatar and (
-                        query_for_avatar['source_photo'] is None or query_for_avatar['source_photo'] != tg_channel_avatar):
-                    SourceDAL.update_sources_values(source_id=src['source_id'], updates={'source_photo': tg_channel_avatar})
+                        query_for_avatar['source_photo'] is None or query_for_avatar[
+                    'source_photo'] != tg_channel_avatar):
+                    SourceDAL.update_sources_values(source_id=src['source_id'],
+                                                    updates={'source_photo': tg_channel_avatar})
 
                 if query_for_avatar and tg_channel_title and (
-                        query_for_avatar['source_title'] is None or query_for_avatar['source_title'] != tg_channel_title):
-                    SourceDAL.update_sources_values(source_id=src['source_id'], updates={'source_title': tg_channel_title})
+                        query_for_avatar['source_title'] is None or query_for_avatar[
+                    'source_title'] != tg_channel_title):
+                    SourceDAL.update_sources_values(source_id=src['source_id'],
+                                                    updates={'source_title': tg_channel_title})
 
                 messages = list(app.get_chat_history(tg_channel_name, limit=limit))
 
@@ -108,14 +81,15 @@ def get_text_media(limit=10, channel_id=6):
 
                 if newest_message:
                     if last_saved_news:
-                        new_news = LastNewsDAL.update_last_news_by_id(last_news_id=last_saved_news['last_news_id'], updates={
-                            'message_id': newest_message.id,
-                            'description': newest_message.text,
-                            'pub_date': newest_message.date,
-                            'title': newest_message.text,
-                            'last_news_photo': temp_post_photo_base64_str,
-                            'url': newest_message.id
-                        })
+                        new_news = LastNewsDAL.update_last_news_by_id(last_news_id=last_saved_news['last_news_id'],
+                                                                      updates={
+                                                                          'message_id': newest_message.id,
+                                                                          'description': newest_message.text,
+                                                                          'pub_date': newest_message.date,
+                                                                          'title': newest_message.text,
+                                                                          'last_news_photo': temp_post_photo_base64_str,
+                                                                          'url': newest_message.id
+                                                                      })
                     else:
                         new_news = LastNewsDAL.insert_last_news(values={
                             'message_id': newest_message.id,
