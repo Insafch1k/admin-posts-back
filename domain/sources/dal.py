@@ -1,5 +1,4 @@
 from psycopg2.extras import RealDictCursor
-from sqlalchemy import select, and_
 from utils.connection_db import connection_db
 from utils.data_state import DataFailedMessage
 
@@ -76,11 +75,57 @@ class SourceDAL:
             return {"error": str(e)}
 
     @staticmethod
-    def add_source(channel_id: int, data):
-        pass
+    def add_source(data):
+        print('dal')
+        try:
+            connection = connection_db()
+            if connection is None:
+                return DataFailedMessage(error_message='Ошибка в работе базы данных!')
+
+            with connection.cursor(cursor_factory=RealDictCursor) as cursor:
+                fields = [key for key in data.keys()]
+                if not fields:
+                    raise ValueError("Нет допустимых полей для вставки.")
+
+                values = [data[field] for field in fields]
+                placeholders = [f"%s" for _ in fields]
+
+                query = f"""
+                        INSERT INTO sources ({', '.join(fields)})
+                        VALUES ({', '.join(placeholders)})
+                        RETURNING source_id;
+                    """
+                cursor.execute(query, values)
+                inserted_id = cursor.fetchone()
+                connection.commit()
+                return inserted_id['source_id']
+        except Exception as e:
+            return {"error": str(e)}
 
 
+    @staticmethod
+    def delete_source(source_id):
+        try:
+            connection = connection_db()
+            if connection is None:
+                return DataFailedMessage(error_message='Ошибка в работе базы данных!')
+            query = """DELETE FROM sources
+                       WHERE source_id = %(source_id)s;"""
+            with connection.cursor(cursor_factory=RealDictCursor) as cursor:
+                cursor.execute(query, {'source_id': source_id})
+                connection.commit()
+                return f'источник {source_id} был удален!'
+        except Exception as e:
+            return {"error": str(e)}
 
-chan_dal = SourceDAL()
+
 # print(chan_dal.get_sources_by_channel_id(6))
 # print(chan_dal.get_source_by_source_name('artemshumeiko'))
+# print(SourceDAL.add_source({
+#                 'source_name': 'asad',
+#                 'type_id': 1,
+#                 'rss_url': 'https://t.me/crypto_vestnic',
+#                 'channel_id': 6,
+#                 'source_title': '123',
+#                 'source_photo': '123'
+#             }))

@@ -4,7 +4,7 @@ from psycopg2.extras import RealDictCursor, RealDictRow
 from psycopg2 import pool
 from contextlib import contextmanager
 import logging
-from utils.config import settings
+from utils.config import Settings
 
 logger = logging.getLogger(__name__)
 
@@ -12,7 +12,7 @@ class DatabaseManager:
     _pool = None
 
     @classmethod
-    def initialize(cls, config: settings):
+    def initialize(cls, config: Settings):
         """Инициализация пула соединений при старте приложения"""
         if cls._pool is None:
             try:

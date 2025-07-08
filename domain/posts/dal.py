@@ -3,11 +3,13 @@ from datetime import datetime, timezone
 from typing import List
 from utils.connection_db import connection_db
 from utils.database_manager import DatabaseManager
+from utils.database_manager import Executor
+from utils.config import Settings
+from .schemas import PostSchema
 
 class PostsDAL:
     @staticmethod
     def get_all_unpublished_posts() -> list[dict]:
-        from utils.database_manager import DatabaseManager
         try:
             with DatabaseManager.get_cursor() as cursor:
                 cursor.execute(
@@ -21,8 +23,6 @@ class PostsDAL:
 
     @staticmethod
     def mark_post_as_published(post_id: int) -> bool:
-        from utils.database_manager import DatabaseManager
-        from datetime import datetime, timezone
         try:
             with DatabaseManager.get_cursor() as cursor:
                 post_published_at = datetime.now(timezone.utc)
@@ -37,7 +37,6 @@ class PostsDAL:
 
     @staticmethod
     def get_post_by_id(post_id: int) -> dict:
-        from utils.database_manager import DatabaseManager
         try:
             with DatabaseManager.get_cursor() as cursor:
                 cursor.execute(
@@ -52,7 +51,6 @@ class PostsDAL:
 
     @staticmethod
     def update_post(post_id: int, updates: dict) -> bool:
-        from utils.database_manager import DatabaseManager
         try:
             with DatabaseManager.get_cursor() as cursor:
                 set_clause = ', '.join([f"{key} = %s" for key in updates.keys()])
@@ -68,7 +66,6 @@ class PostsDAL:
     @staticmethod
     def create_post(channel_id: int, prompt_id: int, content_name: str, content_text: str,
                     scheduled_time: datetime) -> bool:
-        from utils.database_manager import DatabaseManager
         try:
             with DatabaseManager.get_cursor() as cursor:
                 cursor.execute(
@@ -94,3 +91,25 @@ class PostsDAL:
             import logging
             logging.error(f"Error updating post name {post_id}: {e}")
             return False
+        finally:
+            if conn:
+                conn.close()
+
+
+class NewPostDAL(Executor):
+    @staticmethod
+    def get_post_by_channel_id(channel_id: int) -> dict:
+        try:
+            query = """
+                    SELECT *
+                    FROM posts
+                    WHERE channel_id = %s"""
+            result = newPostDAL._execute_query(query=query, params=channel_id, fetchall=True)
+            if result:
+                result = [PostSchema(**res) for res in result]
+            return result
+        except:
+            logging.error(f"Error fetching post by channel id: {channel_id}")
+            raise
+
+
