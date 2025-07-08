@@ -42,3 +42,31 @@ def save_posts_schedule_route():
         return jsonify({'success': True, 'result': result})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
+
+@schedules_bp.route('/update_time', methods=['POST'])
+def update_schedule_time():
+    data = request.get_json()
+    schedule_id = data.get('schedule_id')
+    publish_time = data.get('publish_time')
+
+    if not (schedule_id and publish_time):
+        return jsonify({'success': False, 'error': 'Missing required fields'}), 400
+
+    success, error = ScheduleBL.update_schedule_time(schedule_id, publish_time)
+    if not success:
+        return jsonify({'success': False, 'error': error}), 400
+    return jsonify({'success': True})
+
+@schedules_bp.route('/create', methods=['POST'])
+def create_schedule():
+    data = request.get_json()
+    channel_id = data.get('channel_id')
+    post_id = data.get('post_id')
+    publish_time = data.get('publish_time')
+
+    if not (channel_id and post_id and publish_time):
+        return jsonify({'success': False, 'error': 'Missing required fields'}), 400
+
+    success = ScheduleBL.create_schedule(channel_id, post_id, publish_time)
+    return jsonify({'success': success})
+

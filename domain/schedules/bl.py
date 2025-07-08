@@ -91,3 +91,13 @@ class ScheduleBL:
         ScheduleDAL.insert_schedules(new_schedules)
         ScheduleDAL.upsert_schedule_settings(channel_id, duplication, dublicationWeek, random)
         return {'count': len(new_schedules)}
+
+    @staticmethod
+    def update_schedule_time(schedule_id, publish_time):
+        success = ScheduleDAL.update_schedule_time(schedule_id, publish_time)
+        return success, None if success else 'Update failed'
+
+    @staticmethod
+    def create_schedule(channel_id, post_id, publish_time):
+        success = ScheduleDAL.create_schedule(channel_id, post_id, publish_time)
+        return success
