@@ -2,6 +2,8 @@ import logging
 from datetime import datetime, timezone
 from typing import List
 from utils.connection_db import connection_db
+from utils.database_manager import DatabaseManager
+from utils.config import Settings
 
 class PostsDAL:
     @staticmethod
@@ -125,3 +127,22 @@ class PostsDAL:
         finally:
             if conn:
                 conn.close()
+
+
+class newPostDAL:
+    @staticmethod
+    def get_post_by_channel_id(channel_id: int) -> dict:
+        try:
+            with DatabaseManager.get_cursor() as cursor:
+                query = """
+                SELECT *
+                FROM posts
+                WHERE channel_id = %s;
+                """
+                cursor.execute(query, (channel_id,))
+                result = cursor.fetchall()
+
+                return result
+        except Exception as e:
+            return {f"error in getting post by channel_id {e}"}
+
