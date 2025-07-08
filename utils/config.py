@@ -1,9 +1,8 @@
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv
 from pydantic_settings import BaseSettings
 
-dotenv_path = r"C:\Users\Асадбек\SANAK_TEAM\Zilant-Tg-Robot\admin-posts-back\.env"
 
-load_dotenv(dotenv_path)
+load_dotenv(find_dotenv())
 
 class Settings(BaseSettings):
     DB_NAME: str
