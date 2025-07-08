@@ -2,8 +2,6 @@ from dotenv import load_dotenv, find_dotenv
 from pydantic_settings import BaseSettings
 
 
-load_dotenv(find_dotenv())
-
 class Settings(BaseSettings):
     DB_NAME: str
     DB_USER: str
@@ -19,7 +17,7 @@ class Settings(BaseSettings):
     AUTH: str
 
     class Config:
-        env_file = dotenv_path  # абсолютный путь для pydantic
+        env_file = ".env"
         env_file_encoding = "utf-8"
         case_sensitive = True
 

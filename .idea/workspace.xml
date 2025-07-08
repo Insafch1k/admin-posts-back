@@ -8,14 +8,10 @@
     <list default="true" id="a0fe98d5-f20d-40ce-92e2-bfbf9305c00b" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/utils/downloads/media/photo_2025-06-23_10-16-58_7519461968256696332.jpg" beforeDir="false" />
 =======
-    <list default="true" id="5624795d-73e8-4b53-a939-68aa8943d30a" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/domain/database.py" beforeDir="false" afterPath="$PROJECT_DIR$/domain/database.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/poetry.lock" beforeDir="false" afterPath="$PROJECT_DIR$/poetry.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pyproject.toml" beforeDir="false" afterPath="$PROJECT_DIR$/pyproject.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/config.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/downloads/media/photo_2025-06-23_10-16-58_7519461968256696332.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/parse.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/parse.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/user-app.session" beforeDir="false" afterPath="$PROJECT_DIR$/utils/user-app.session" afterDir="false" />
+    <list default="true" id="5624795d-73e8-4b53-a939-68aa8943d30a" name="Changes" comment="create is_fit and is_relevant functions">
+      <change beforePath="$PROJECT_DIR$/.idea/admin-posts-back.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/admin-posts-back.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
 >>>>>>> eb0327c6c3c9fe18309d0233e06080c03a32a2d6
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -38,10 +34,28 @@
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;Ratmirochka&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/Insafch1k/admin-posts-back.git&quot;,
+    &quot;accountId&quot;: &quot;e8b260cd-22bb-41d0-85b8-5c93d4091cb1&quot;
+  }
+}</component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="DEPENDENCY_CHECKER_PROBLEMS_TAB" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 5
 }</component>
   <component name="ProjectId" id="2yu1vB7Z0nLSg3znAby179kWlbD" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -56,14 +70,62 @@
   }
 }</component>
 =======
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "last_opened_file_path": "C:/Users/Асадбек/SANAK_TEAM/Tg-parse",
-    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;Python.base.executor&quot;: &quot;Run&quot;,
+    &quot;Python.base_model.executor&quot;: &quot;Run&quot;,
+    &quot;Python.dal.executor&quot;: &quot;Run&quot;,
+    &quot;Python.main.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Асадбек/SANAK_TEAM/Tg-parse&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
   }
-}]]></component>
+}</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\ratmi\PycharmProjects\admin-posts-back\domain\keywords" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="main" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="admin-posts-back" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.main" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-python-sdk-890ed5b35930-d9c5bdb153f4-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-251.23774.444" />
+      </set>
+    </attachedChunks>
+  </component>
 >>>>>>> eb0327c6c3c9fe18309d0233e06080c03a32a2d6
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -74,6 +136,87 @@
       <option name="presentableId" value="Default" />
       <updated>1750669874271</updated>
     </task>
+    <task id="LOCAL-00001" summary="change models">
+      <option name="closed" value="true" />
+      <created>1751355976520</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1751355976520</updated>
+    </task>
+    <task id="LOCAL-00002" summary="add api for getting keywords and styles">
+      <option name="closed" value="true" />
+      <created>1751386513193</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1751386513193</updated>
+    </task>
+    <task id="LOCAL-00003" summary="create posts">
+      <option name="closed" value="true" />
+      <created>1751447634769</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1751447634769</updated>
+    </task>
+    <task id="LOCAL-00004" summary="create posts">
+      <option name="closed" value="true" />
+      <created>1751448546776</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1751448546776</updated>
+    </task>
+    <task id="LOCAL-00005" summary="create posts">
+      <option name="closed" value="true" />
+      <created>1751448649413</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1751448649413</updated>
+    </task>
+    <task id="LOCAL-00006" summary="update base">
+      <option name="closed" value="true" />
+      <created>1751450570713</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1751450570713</updated>
+    </task>
+    <task id="LOCAL-00007" summary="update base">
+      <option name="closed" value="true" />
+      <created>1751456283601</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1751456283601</updated>
+    </task>
+    <task id="LOCAL-00008" summary="update base">
+      <option name="closed" value="true" />
+      <created>1751459822665</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1751459822665</updated>
+    </task>
+    <task id="LOCAL-00009" summary="update base">
+      <option name="closed" value="true" />
+      <created>1751465108747</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1751465108747</updated>
+    </task>
+    <task id="LOCAL-00010" summary="create is_fit and is_relevant functions">
+      <option name="closed" value="true" />
+      <created>1751530071625</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1751530071625</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -86,5 +229,23 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="change models" />
+    <MESSAGE value="add api for getting keywords and styles" />
+    <MESSAGE value="create posts" />
+    <MESSAGE value="update base" />
+    <MESSAGE value="create is_fit and is_relevant functions" />
+    <option name="LAST_COMMIT_MESSAGE" value="create is_fit and is_relevant functions" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/utils/parse.py</url>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>
