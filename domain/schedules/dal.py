@@ -140,3 +140,14 @@ class ScheduleDAL:
             logging.error(f"Error creating schedule: {e}")
             return False
 
+    @staticmethod
+    def delete_schedules_by_post_id(post_id):
+        try:
+            with DatabaseManager.get_cursor() as cursor:
+                cursor.execute(
+                    "DELETE FROM schedules WHERE post_id = %s", (post_id,)
+                )
+                return True
+        except Exception as e:
+            logging.error(f"Error deleting schedule: {e}")
+            return False

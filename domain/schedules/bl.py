@@ -101,3 +101,8 @@ class ScheduleBL:
     def create_schedule(channel_id, post_id, publish_time):
         success = ScheduleDAL.create_schedule(channel_id, post_id, publish_time)
         return success
+
+    @staticmethod
+    def delete_post_time(post_id):
+        return ScheduleDAL.delete_schedules_by_post_id(post_id)
+

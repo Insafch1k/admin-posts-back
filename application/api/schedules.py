@@ -70,3 +70,11 @@ def create_schedule():
     success = ScheduleBL.create_schedule(channel_id, post_id, publish_time)
     return jsonify({'success': success})
 
+@schedules_bp.route('/<int:post_id>', methods=['DELETE'])
+def delete_post_time(post_id):
+    result = ScheduleBL.delete_post_time(post_id)
+    if result:
+        return jsonify({'status': 'success'}), 200
+    else:
+        return jsonify({'status': 'error', 'message': 'Failed to delete schedule'}), 400
+
