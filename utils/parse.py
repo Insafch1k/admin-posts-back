@@ -31,21 +31,30 @@ def get_text_media(limit=10, channel_id=6):
             print(f"📡 Парсинг канала: {tg_channel_name}")
 
             # Загрузка фото канала
-            tg_channel_avatar, tg_channel_title = download_avatar_to_base64(tg_channel_name)
+            chat_general_info = download_avatar_to_base64(tg_channel_name)
+            tg_channel_avatar = chat_general_info['avatar']
+            tg_channel_title = chat_general_info['title']
+            subscribers_count = chat_general_info['subscribers']
 
-            query_for_avatar = SourceDAL.get_source_by_source_name(tg_channel_name)
+            query_for_avatar = SourceBL.get_source_by_source_name(tg_channel_name)
 
             if query_for_avatar and tg_channel_avatar and (
                     query_for_avatar['source_photo'] is None or query_for_avatar[
                 'source_photo'] != tg_channel_avatar):
-                SourceDAL.update_sources_values(source_id=src['source_id'],
+                SourceBL.update_sources_values(source_id=src['source_id'],
                                                 updates={'source_photo': tg_channel_avatar})
 
             if query_for_avatar and tg_channel_title and (
                     query_for_avatar['source_title'] is None or query_for_avatar[
                 'source_title'] != tg_channel_title):
-                SourceDAL.update_sources_values(source_id=src['source_id'],
+                SourceBL.update_sources_values(source_id=src['source_id'],
                                                 updates={'source_title': tg_channel_title})
+
+            if query_for_avatar and subscribers_count and (
+                    query_for_avatar['subscribers'] is None or query_for_avatar[
+                'subscribers'] != subscribers_count):
+                SourceBL.update_sources_values(source_id=src['source_id'],
+                                                updates={'subscribers': subscribers_count})
 
             messages = get_history_of_chat(tg_channel_name, limit=limit)
 

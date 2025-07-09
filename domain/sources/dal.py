@@ -1,131 +1,120 @@
-from psycopg2.extras import RealDictCursor
-from utils.connection_db import connection_db
+from typing import Optional, Dict, Any, Union
+from domain.source_type.dal import SourceTypeDAL
 from utils.data_state import DataFailedMessage
+from utils.database_manager import Executor, logger
 
 
-class SourceDAL:
+class SourceDAL(Executor):
     @staticmethod
     def get_sources_by_channel_id(channel_id: int):
         try:
-            connection = connection_db()
-            if connection is None:
-                return DataFailedMessage(error_message='Ошибка в работе базы данных!')
+            type_id = SourceTypeDAL.get_type_id_by_name('Тг канал')
+            if type_id is None:
+                print("❌ Не найден тип 'Тг канал'")
+                return []
 
-            with connection.cursor(cursor_factory=RealDictCursor) as cursor:
-                # Получаем type_id для "Тг канал"
-                sql = "SELECT type_id FROM source_type WHERE type_name = 'Тг канал'"
-                cursor.execute(sql)
-                data = cursor.fetchone()
-                if data is None:
-                    print("❌ Не найден тип 'Тг канал'")
-                    return []
-
-                id_of_news_type = data['type_id']
-
-                # Параметризованный запрос
-                sql1 = '''
-                SELECT source_id, source_name, source_title, rss_url, source_photo
-                FROM sources 
-                WHERE channel_id = %(channel_id)s AND type_id = %(type_id)s
-                '''
-                cursor.execute(sql1, {'channel_id': channel_id, 'type_id': id_of_news_type})
-                sources = cursor.fetchall()
-                return sources
-        except Exception as e:
-            return {"error": str(e)}
-
-    @staticmethod
-    def get_source_by_source_name(source_name):
-        try:
-            connection = connection_db()
-            if connection is None:
-                return DataFailedMessage(error_message='Ошибка в работе базы данных!')
-
-            with connection.cursor(cursor_factory=RealDictCursor) as cursor:
-                sql = 'SELECT * FROM sources WHERE source_name = %(source_name)s'
-                cursor.execute(sql, {'source_name': source_name})
-                source = cursor.fetchone()
-            return dict(source) if source else None
+            query = """
+                    SELECT source_id, source_name, source_title, rss_url, source_photo
+                    FROM sources
+                    WHERE channel_id = %s AND type_id = %s
+                """
+            sources = Executor._execute_query(
+                query=query,
+                params=(channel_id, type_id),
+                fetchall=True
+            )
+            return sources or []
 
         except Exception as e:
             return {"error": str(e)}
 
     @staticmethod
-    def update_sources_values(source_id: int, updates: dict):
+    def get_source_by_source_name(source_name: str) -> Optional[Union[Dict, None]]:
+        """Получить источник по названию источника"""
         try:
-            connection = connection_db()
-            if connection is None:
-                return DataFailedMessage(error_message='Ошибка в работе базы данных!')
+            query = 'SELECT * FROM sources WHERE source_name = %s'
+            result = Executor._execute_query(
+                query=query,
+                params=(source_name,),
+                fetchone=True
+            )
+            return result if result else None
 
-            with connection.cursor(cursor_factory=RealDictCursor) as cursor:
-                # Построение части запроса SET col1 = %(col1)s, col2 = %(col2)s ...
-                set_clause = ', '.join([f"{key} = %({key})s" for key in updates.keys()])
-                query = f"""
+        except Exception as e:
+            logger.error(f"Ошибка при получении источника: {e}")
+            return {"error": str(e)}
+
+    @staticmethod
+    def update_sources_values(source_id: int, updates: dict) -> Union[Dict[str, Any], DataFailedMessage, None]:
+        try:
+            if not updates:
+                raise ValueError("Нет данных для обновления.")
+
+            set_clause = ', '.join([f"{key} = %({key})s" for key in updates.keys()])
+            query = f"""
                     UPDATE sources
                     SET {set_clause}
                     WHERE source_id = %(source_id)s
                     RETURNING *;
                 """
-                # Добавляем source_id к параметрам
-                updates['source_id'] = source_id
-                cursor.execute(query, updates)
-                connection.commit()
-                return cursor.fetchone()
+
+            updates['source_id'] = source_id
+
+            result = Executor._execute_query(
+                query=query,
+                params=updates,
+                fetchone=True
+            )
+            return result if result else None
+
         except Exception as e:
+            logger.error(f"Ошибка при обновлении источника: {e}")
             return {"error": str(e)}
 
     @staticmethod
-    def add_source(data):
-        print('dal')
+    def add_source(data: dict) -> Union[int, Dict[str, str]]:
         try:
-            connection = connection_db()
-            if connection is None:
-                return DataFailedMessage(error_message='Ошибка в работе базы данных!')
+            if not data:
+                raise ValueError("Нет допустимых полей для вставки.")
 
-            with connection.cursor(cursor_factory=RealDictCursor) as cursor:
-                fields = [key for key in data.keys()]
-                if not fields:
-                    raise ValueError("Нет допустимых полей для вставки.")
+            fields = list(data.keys())
+            values = [data[field] for field in fields]
+            placeholders = ', '.join(['%s'] * len(fields))
 
-                values = [data[field] for field in fields]
-                placeholders = [f"%s" for _ in fields]
+            query = f"""
+                    INSERT INTO sources ({', '.join(fields)})
+                    VALUES ({placeholders})
+                    RETURNING source_id;
+                """
 
-                query = f"""
-                        INSERT INTO sources ({', '.join(fields)})
-                        VALUES ({', '.join(placeholders)})
-                        RETURNING source_id;
-                    """
-                cursor.execute(query, values)
-                inserted_id = cursor.fetchone()
-                connection.commit()
-                return inserted_id['source_id']
+            result = Executor._execute_query(
+                query=query,
+                params=values,
+                fetchone=True
+            )
+            return result['source_id'] if result else None
+
         except Exception as e:
+            logger.error(f"Ошибка при добавлении источника: {e}")
             return {"error": str(e)}
-
 
     @staticmethod
-    def delete_source(source_id):
+    def delete_source(source_id: int) -> Union[str, Dict[str, str]]:
         try:
-            connection = connection_db()
-            if connection is None:
-                return DataFailedMessage(error_message='Ошибка в работе базы данных!')
-            query = """DELETE FROM sources
-                       WHERE source_id = %(source_id)s;"""
-            with connection.cursor(cursor_factory=RealDictCursor) as cursor:
-                cursor.execute(query, {'source_id': source_id})
-                connection.commit()
-                return f'источник {source_id} был удален!'
+            query = """
+                    DELETE FROM sources
+                    WHERE source_id = %(source_id)s;
+                """
+
+            Executor._execute_query(
+                query=query,
+                params={'source_id': source_id}
+            )
+            return f"Источник {source_id} был удалён!"
+
         except Exception as e:
+            logger.error(f"Ошибка при удалении источника: {e}")
             return {"error": str(e)}
 
 
-# print(chan_dal.get_sources_by_channel_id(6))
-# print(chan_dal.get_source_by_source_name('artemshumeiko'))
-# print(SourceDAL.add_source({
-#                 'source_name': 'asad',
-#                 'type_id': 1,
-#                 'rss_url': 'https://t.me/crypto_vestnic',
-#                 'channel_id': 6,
-#                 'source_title': '123',
-#                 'source_photo': '123'
-#             }))
+# print(SourceDAL.get_sources_by_channel_id(6))
