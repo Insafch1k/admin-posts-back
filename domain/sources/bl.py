@@ -1,7 +1,8 @@
 from domain.sources.dal import SourceDAL
 from domain.sources.schemas import SourceSchemaOut
 from utils.downloads.work_with_photo import tg_app, download_avatar_to_base64
-
+from utils.rss.validators import validate_url
+import feedparser
 
 def detect_link_type(url: str) -> str:
     if "t.me/" in url or url.startswith("https://t.me/"):
@@ -14,8 +15,8 @@ def detect_link_type(url: str) -> str:
 
 class SourceBL:
     @staticmethod
-    def get_sources_by_channel_id(channel_id):
-        sources = SourceDAL.get_sources_by_channel_id(channel_id)
+    def get_sources_by_channel_id(channel_id, type_name):
+        sources = SourceDAL.get_sources_by_channel_id(channel_id, type_name)
         if sources:
             # Валидация и сериализация через Pydantic
             validated = [SourceSchemaOut.model_validate(item).model_dump() for item in sources]
@@ -33,7 +34,23 @@ class SourceBL:
     @staticmethod
     def add_source(data):
         if detect_link_type(data['url']) == 'rss_url':
-            pass
+            print('rss_url')
+            validated_url = validate_url(data['url'])
+            feed = feedparser.parse(validated_url)
+            tape_name = feed['feed']['title'] if feed['feed']['title'] else feed['feed']['subtitle']
+            tape_photo = feed['feed']['image']['href'] if feed['feed']['image'] else None
+            try:
+                res = SourceDAL.add_source({
+                    'source_name': tape_name,
+                    'type_id': 2,
+                    'rss_url': data['url'],
+                    'channel_id': data['channel_id'],
+                    'source_title': tape_name,
+                    'source_photo': tape_photo
+                })
+                return res
+            except Exception as e:
+                return e
         elif detect_link_type(data['url']) == "tg_url":
             print('tg_url')
             source_name = data['url'].rsplit('/', 1)[-1]

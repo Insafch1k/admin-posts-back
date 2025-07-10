@@ -6,9 +6,9 @@ from utils.database_manager import Executor, logger
 
 class SourceDAL(Executor):
     @staticmethod
-    def get_sources_by_channel_id(channel_id: int):
+    def get_sources_by_channel_id(channel_id: int, type_name):
         try:
-            type_id = SourceTypeDAL.get_type_id_by_name('Тг канал')
+            type_id = SourceTypeDAL.get_type_id_by_name(type_name)
             if type_id is None:
                 print("❌ Не найден тип 'Тг канал'")
                 return []
@@ -86,10 +86,10 @@ class SourceDAL(Executor):
                     VALUES ({placeholders})
                     RETURNING source_id;
                 """
-
+            print(data, query)
             result = Executor._execute_query(
                 query=query,
-                params=values,
+                params=tuple(values),
                 fetchone=True
             )
             return result['source_id'] if result else None
@@ -117,4 +117,4 @@ class SourceDAL(Executor):
             return {"error": str(e)}
 
 
-# print(SourceDAL.get_sources_by_channel_id(6))
+# print(SourceDAL.get_sources_by_channel_id(6,'RSS лента'))

@@ -19,5 +19,5 @@ class SourceTypeDAL(Executor):
             logger.error(f"Ошибка при получении type_id: {e}")
             return None
 
-# res = SourceTypeDAL.get_type_id_by_name('Тг канал')
+# res = SourceTypeDAL.get_type_id_by_name('RSS лента')
 # print(res)

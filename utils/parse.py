@@ -18,11 +18,8 @@ if not os.path.exists(MEDIA_FOLDER):
 
 def get_text_media(limit=10, channel_id=6):
     from domain.sources.bl import SourceBL
-    Session = connection_db()
-    if Session is None:
-        return DataFailedMessage(error_message='Ошибка в работе базы данных!')
 
-    sources = SourceBL.get_sources_by_channel_id(channel_id)
+    sources = SourceBL.get_sources_by_channel_id(channel_id, type_name='Тг канал')
     result = []
     try:
         for src in sources:
