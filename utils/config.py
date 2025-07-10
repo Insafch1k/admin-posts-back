@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     SECRET_KEY: str
     JWT_SECRET_KEY: str
     AUTH: str
-
+    BOT_TOKEN: str
     class Config:
         env_file = find_dotenv()
         env_file_encoding = "utf-8"

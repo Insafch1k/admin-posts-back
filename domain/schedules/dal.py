@@ -95,10 +95,9 @@ class ScheduleDAL:
     @staticmethod
     def insert_schedules(schedules):
         """
-        Вставляет несколько расписаний в таблицу schedules.
-        schedules: список словарей с ключами channel_id, post_id, publish_time
+        Вставляет несколько расписаний в таблицу schedules и возвращает их id.
         """
-        from utils.database_manager import DatabaseManager
+        created_ids = []
         try:
             with DatabaseManager.get_cursor() as cursor:
                 for sched in schedules:
@@ -106,9 +105,13 @@ class ScheduleDAL:
                         """
                         INSERT INTO schedules (channel_id, post_id, publish_time)
                         VALUES (%s, %s, %s)
+                        RETURNING schedule_id
                         """,
                         (sched['channel_id'], sched['post_id'], sched['publish_time'])
                     )
+                    new_id = cursor.fetchone()['schedule_id']
+                    created_ids.append(new_id)
+            return created_ids
         except Exception as e:
             logging.error(f"Error inserting schedules: {e}")
             raise

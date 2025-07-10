@@ -68,6 +68,7 @@ class ScheduleBL:
         for schedule in schedules:
             publish_time = schedule.publish_time
             posts.append(OrderedDict([
+                ("post_id", schedule.post_id),  # <--- добавляем id
                 ("name", f"{schedule.post_id} пост"),
                 ("time", publish_time.strftime("%H:%M")),
                 ("date", publish_time.strftime("%d.%m"))
@@ -85,12 +86,12 @@ class ScheduleBL:
             publish_time = datetime.combine(date_part.replace(year=datetime.now().year), time_part)
             new_schedules.append({
                 'channel_id': channel_id,
-                'post_id': post['name'].split()[0],
+                'post_id': post['post_id'],
                 'publish_time': publish_time
             })
-        ScheduleDAL.insert_schedules(new_schedules)
+        created_id = ScheduleDAL.insert_schedules(new_schedules)
         ScheduleDAL.upsert_schedule_settings(channel_id, duplication, dublicationWeek, random)
-        return {'count': len(new_schedules)}
+        return {'count': len(new_schedules), 'schedule_id': created_id}
 
     @staticmethod
     def update_schedule_time(schedule_id, publish_time):
@@ -106,3 +107,12 @@ class ScheduleBL:
     def delete_post_time(post_id):
         return ScheduleDAL.delete_schedules_by_post_id(post_id)
 
+    @staticmethod
+    def update_schedule_flags(channel_id, duplication, dublicationWeek, random):
+        try:
+            ScheduleDAL.upsert_schedule_settings(channel_id, duplication, dublicationWeek, random)
+            return True
+        except Exception as e:
+            import logging
+            logging.error(f"Error updating schedule flags: {e}")
+            return False

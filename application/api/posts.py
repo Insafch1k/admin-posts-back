@@ -32,19 +32,53 @@ def get_user_channels():
     except Exception as e:
         return jsonify({"error": str(e), "data": None}), 500
 
-@posts_bp.route('/update_name', methods=['POST'])
-def update_post_name():
+@posts_bp.route('/update', methods=['POST'])
+def update_post():
     data = request.get_json()
     post_id = data.get('post_id')
-    name = data.get('name')
+    content_name = data.get('content_name')
+    time_ = data.get('time')
 
-    if not (post_id and name):
+    if not (post_id and content_name and time_):
         return jsonify({'success': False, 'error': 'Missing required fields'}), 400
 
-    success, error = PostsBL.update_post_name(post_id, name)
-    if not success:
-        return jsonify({'success': False, 'error': error}), 400
+    success_name, error_name = PostsBL.update_post_name(post_id, content_name)
+    success_time, error_time = PostsBL.update_time_by_post_id(post_id, time_)
+
+    if not success_name or not success_time:
+        return jsonify({'success': False, 'error': error_name or error_time}), 400
     return jsonify({'success': True})
 
+@posts_bp.route('/<int:post_id>', methods=['DELETE'])
+def delete_post(post_id):
+    result = PostsBL.delete_post(post_id)
+    if result:
+        return jsonify({'status': 'success'}), 200
+    else:
+        return jsonify({'status': 'error', 'message': 'Failed to delete post'}), 400
 
+@posts_bp.route('/create', methods=['POST'])
+def create_post():
+    data = request.get_json()
+    content_name = data.get('content_name')
+    content_text = data.get('content_text')
+    date = data.get('date')
+    time_ = data.get('time')
+    channel_id = data.get('channel_id')
+    prompt_id = data.get('prompt_id')
 
+    if not (content_name and content_text and date and time_ and channel_id and prompt_id):
+        return jsonify({'success': False, 'error': 'Missing required fields'}), 400
+
+    post_id = PostsBL.create_post_and_return_id(
+        content_name=content_name,
+        content_text=content_text,
+        date=date,
+        time_=time_,
+        channel_id=channel_id,
+        prompt_id=prompt_id
+    )
+    if not post_id:
+        return jsonify({'success': False, 'error': 'Failed to create post'}), 400
+
+    return jsonify({'success': True, 'post_id': post_id})

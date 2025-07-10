@@ -43,38 +43,18 @@ def save_posts_schedule_route():
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 
-@schedules_bp.route('/update_time', methods=['POST'])
-def update_schedule_time():
-    data = request.get_json()
-    schedule_id = data.get('schedule_id')
-    publish_time = data.get('publish_time')
-
-    if not (schedule_id and publish_time):
-        return jsonify({'success': False, 'error': 'Missing required fields'}), 400
-
-    success, error = ScheduleBL.update_schedule_time(schedule_id, publish_time)
-    if not success:
-        return jsonify({'success': False, 'error': error}), 400
-    return jsonify({'success': True})
-
-@schedules_bp.route('/create', methods=['POST'])
-def create_schedule():
+@schedules_bp.route('/flags', methods=['POST'])
+def update_schedule_flags():
     data = request.get_json()
     channel_id = data.get('channel_id')
-    post_id = data.get('post_id')
-    publish_time = data.get('publish_time')
+    duplication = data.get('duplication')
+    dublicationWeek = data.get('dublicationWeek')
+    random = data.get('random')
 
-    if not (channel_id and post_id and publish_time):
+    if channel_id is None or duplication is None or dublicationWeek is None or random is None:
         return jsonify({'success': False, 'error': 'Missing required fields'}), 400
 
-    success = ScheduleBL.create_schedule(channel_id, post_id, publish_time)
-    return jsonify({'success': success})
-
-@schedules_bp.route('/<int:post_id>', methods=['DELETE'])
-def delete_post_time(post_id):
-    result = ScheduleBL.delete_post_time(post_id)
-    if result:
-        return jsonify({'status': 'success'}), 200
-    else:
-        return jsonify({'status': 'error', 'message': 'Failed to delete schedule'}), 400
-
+    success = ScheduleBL.update_schedule_flags(channel_id, duplication, dublicationWeek, random)
+    if not success:
+        return jsonify({'success': False, 'error': 'Failed to update flags'}), 400
+    return jsonify({'success': True})

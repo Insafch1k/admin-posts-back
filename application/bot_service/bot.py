@@ -4,7 +4,8 @@ from aiogram import Bot, Dispatcher
 from application.bot_service.scheduler import setup_scheduler
 from utils.connection_db import connection_db
 from utils.config import settings
-
+from utils.database_manager import DatabaseManager
+#from application.bot_service.parser_integration import parser_integration
 
 async def main():
     """
@@ -14,10 +15,11 @@ async def main():
 
     # Инициализация подключения к БД
     try:
-        connection_db()
-        logging.info("Database connection initialized.")
+        DatabaseManager.initialize(settings)
+        logging.info("Database connection pool initialized.")
+
     except Exception as e:
-        logging.error(f"Could not initialize database connection: {e}")
+        logging.error(f"Could not initialize database connection pool: {e}")
         return
 
     bot = Bot(token=settings.BOT_TOKEN)
