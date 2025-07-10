@@ -84,6 +84,8 @@ class Executor:
             with Executor._get_cursor() as cursor:
                 if params and isinstance(params, list):
                     cursor.executemany(query, params)
+                elif params and isinstance(params, dict):
+                    cursor.execute(query, params)
                 else:
                     if params and not isinstance(params, tuple):
                         params = (params,)

@@ -4,7 +4,6 @@ import os
 from utils.downloads.telegram_client_runner import tg_app, loop
 
 def download_avatar_to_base64(tg_channel_name):
-    print('tg_photo')
 
     async def _inner():
         chat = await tg_app.get_chat(tg_channel_name)
@@ -34,7 +33,10 @@ def download_avatar_to_base64(tg_channel_name):
 
 def get_history_of_chat(tg_channel_name, limit):
     async def _inner():
-        return await tg_app.get_chat_history(tg_channel_name, limit=limit)
+        messages = []
+        async for message in tg_app.get_chat_history(tg_channel_name, limit=limit):
+            messages.append(message)
+        return messages
 
     future = asyncio.run_coroutine_threadsafe(_inner(), loop)
     return future.result()

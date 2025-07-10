@@ -46,6 +46,7 @@ class SourceDAL(Executor):
 
     @staticmethod
     def update_sources_values(source_id: int, updates: dict) -> Union[Dict[str, Any], DataFailedMessage, None]:
+
         try:
             if not updates:
                 raise ValueError("Нет данных для обновления.")
@@ -59,7 +60,6 @@ class SourceDAL(Executor):
                 """
 
             updates['source_id'] = source_id
-
             result = Executor._execute_query(
                 query=query,
                 params=updates,
