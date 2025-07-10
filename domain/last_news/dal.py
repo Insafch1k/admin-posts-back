@@ -51,7 +51,7 @@ class LastNewsDAL():
             return {"error": str(e)}
 
     @staticmethod
-    def insert_last_news(values: dict):
+    def insert_last_news(updates: dict):
         try:
             connection = connection_db()
             if connection is None:
@@ -59,8 +59,8 @@ class LastNewsDAL():
 
             with connection.cursor(cursor_factory=RealDictCursor) as cursor:
                 # Получаем список колонок и соответствующих плейсхолдеров
-                columns = ', '.join(values.keys())
-                placeholders = ', '.join([f"%({key})s" for key in values.keys()])
+                columns = ', '.join(updates.keys())
+                placeholders = ', '.join([f"%({key})s" for key in updates.keys()])
 
                 query = f"""
                     INSERT INTO lastnews ({columns})
@@ -68,7 +68,7 @@ class LastNewsDAL():
                     RETURNING *;
                 """
 
-                cursor.execute(query, values)
+                cursor.execute(query, updates)
                 connection.commit()
                 return cursor.fetchone()
 

@@ -8,6 +8,7 @@ from utils.config import Settings
 
 logger = logging.getLogger(__name__)
 
+
 class DatabaseManager:
     _pool = None
 
@@ -34,6 +35,12 @@ class DatabaseManager:
     @contextmanager
     def get_cursor(cls) -> Iterator[RealDictCursor]:
         """Контекстный менеджер для безопасной работы с курсором"""
+        if cls._pool is None:
+            from utils.config import settings  # импорт внутри, чтобы избежать циклических импортов
+            cls.initialize(settings)
+
+        if cls._pool is None:
+            raise RuntimeError("Database pool is not initialized. Call DatabaseManager.initialize(config) first.")
         conn = None
         try:
             conn = cls._pool.getconn()
@@ -67,16 +74,18 @@ class Executor:
 
     @staticmethod
     def _execute_query(
-        query: str,
-        params: Optional[Union[tuple, list, dict]] = None,
-        fetchall: bool = False,
-        fetchone: bool = False
+            query: str,
+            params: Optional[Union[tuple, list, dict]] = None,
+            fetchall: bool = False,
+            fetchone: bool = False
     ) -> Union[List[Dict[str, Any]], Dict[str, Any], None]:
         """Метод для выполнения SQL запросов с использованием пула соединений"""
         try:
             with Executor._get_cursor() as cursor:
                 if params and isinstance(params, list):
                     cursor.executemany(query, params)
+                elif params and isinstance(params, dict):
+                    cursor.execute(query, params)
                 else:
                     if params and not isinstance(params, tuple):
                         params = (params,)
@@ -94,3 +103,4 @@ class Executor:
         except Exception as e:
             logger.error(f"Error executing query: {e}")
             raise RuntimeError(f"Database operation failed: {e}")
+

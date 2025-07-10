@@ -20,6 +20,8 @@ def parse_article(url):
         print(f"Error parsing article: {e}")
         return None
 
+# print(parse_article('https://www.rbc.ru/textonlines/18/04/2024/6216fb4d9a79474dc80e8821'))
+
 
 
 

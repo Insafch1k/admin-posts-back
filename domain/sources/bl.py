@@ -23,6 +23,14 @@ class SourceBL:
         return {'error': 'Не получили sources!'}
 
     @staticmethod
+    def get_source_by_source_name(source_name: str):
+        source = SourceDAL.get_source_by_source_name(source_name)
+        if source:
+            validated = SourceSchemaOut.model_validate(source).model_dump()
+            return validated
+        return {'error': 'Не получили source!'}
+
+    @staticmethod
     def add_source(data):
         if detect_link_type(data['url']) == 'rss_url':
             pass
@@ -50,7 +58,7 @@ class SourceBL:
     def update_sources(source_id, updates):
         res = SourceDAL.update_sources_values(source_id, updates)
         if res:
-            return dict(res)['source_id']
+            return res['source_id']
         else:
             raise Exception("Не удалось обновить данные!")
 
@@ -65,3 +73,4 @@ class SourceBL:
 
 
 # print(SourceBL.add_source({"channel_id": 6, "url": "https://t.me/crypto_vestnic"}))
+# print(SourceBL.get_sources_by_channel_id(6))
